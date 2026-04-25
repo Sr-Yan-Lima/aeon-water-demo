@@ -1,0 +1,2695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="ÆON · Vol. I · Issue 001 · Aletsch · MMXXVI — Monograph of Pleistocene alpine water.">
+<title>ÆON · Water, written in stone</title>
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Google Fonts: Fraunces (variable) + Inter + JetBrains Mono -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300;9..144,400;9..144,500&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- GSAP 3.12.5 + ScrollTrigger + Lenis 1.0.42 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+
+<style>
+/* ============================================================
+   ÆON · Design Tokens
+   Palette: 10 hex · Editorial-tech · Glacial · Mineral
+   ============================================================ */
+:root {
+  /* Colors — locked palette */
+  --ice-paper:        #F4F6F8;
+  --ice-shadow:       #E6EAEE;
+  --ice-rule:         #D4DAE0;
+  --graphite-deep:    #0E1215;
+  --graphite-soft:    #2A3038;
+  --glacier-blue:     #8FA7B5;
+  --glacier-vapor:    #C8D4DB;
+  --nordic-gold:      #B69863;
+  --nordic-gold-dim:  #8C7348;
+  --quartz-white:     #FBFCFD;
+
+  /* Semantic — drive the scroll-acts */
+  --bg:      var(--ice-paper);
+  --fg:      var(--graphite-deep);
+  --fg-soft: var(--graphite-soft);
+  --rule:    var(--ice-rule);
+  --accent:  var(--nordic-gold);
+
+  /* Typography */
+  --font-display: 'Fraunces', 'Times New Roman', serif;
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Easings */
+  --ease-glacial: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-precise: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-mineral: cubic-bezier(0.33, 0.02, 0.18, 1);
+
+  /* Durations */
+  --dur-micro:  180ms;
+  --dur-short:  420ms;
+  --dur-medium: 900ms;
+  --dur-long:   1800ms;
+
+  /* Spacing base 8 */
+  --s-1:   8px;
+  --s-2:   16px;
+  --s-3:   24px;
+  --s-4:   40px;
+  --s-5:   64px;
+  --s-6:   96px;
+  --s-7:   160px;
+  --s-8:   240px;
+
+  /* Section rhythm */
+  --rhythm: 160px;
+}
+
+/* ============================================================
+   Reset + Base
+   ============================================================ */
+* { box-sizing: border-box; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--fg);
+  background-color: var(--bg);
+  font-feature-settings: 'ss01', 'cv11', 'tnum';
+  transition: background-color var(--dur-medium) var(--ease-glacial),
+              color var(--dur-medium) var(--ease-glacial);
+  overflow-x: hidden;
+}
+
+/* Millimeter paper — global background */
+.paper-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image:
+    /* 1mm fine */
+    linear-gradient(to right, rgba(14, 18, 21, 0.03) 0.25px, transparent 0.25px),
+    linear-gradient(to bottom, rgba(14, 18, 21, 0.03) 0.25px, transparent 0.25px),
+    /* 5mm medium */
+    linear-gradient(to right, rgba(14, 18, 21, 0.05) 0.4px, transparent 0.4px),
+    linear-gradient(to bottom, rgba(14, 18, 21, 0.05) 0.4px, transparent 0.4px),
+    /* 10mm strong */
+    linear-gradient(to right, rgba(14, 18, 21, 0.07) 0.5px, transparent 0.5px),
+    linear-gradient(to bottom, rgba(14, 18, 21, 0.07) 0.5px, transparent 0.5px);
+  background-size:
+    8px 8px,
+    8px 8px,
+    40px 40px,
+    40px 40px,
+    80px 80px,
+    80px 80px;
+  opacity: 0.6;
+  mix-blend-mode: multiply;
+  transition: opacity var(--dur-medium) var(--ease-glacial);
+}
+
+[data-grid-density="dense"] .paper-grid { opacity: 1; }
+[data-act="capture"] .paper-grid,
+[data-act="inverted"] .paper-grid {
+  background-image:
+    linear-gradient(to right, rgba(244, 246, 248, 0.04) 0.25px, transparent 0.25px),
+    linear-gradient(to bottom, rgba(244, 246, 248, 0.04) 0.25px, transparent 0.25px),
+    linear-gradient(to right, rgba(244, 246, 248, 0.06) 0.4px, transparent 0.4px),
+    linear-gradient(to bottom, rgba(244, 246, 248, 0.06) 0.4px, transparent 0.4px),
+    linear-gradient(to right, rgba(244, 246, 248, 0.08) 0.5px, transparent 0.5px),
+    linear-gradient(to bottom, rgba(244, 246, 248, 0.08) 0.5px, transparent 0.5px);
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 80px;
+  position: relative;
+  z-index: 2;
+}
+@media (max-width: 768px) {
+  .container { padding: 0 20px; }
+}
+
+/* Section rhythm */
+section {
+  position: relative;
+  padding: var(--rhythm) 0;
+  z-index: 2;
+}
+@media (max-width: 768px) {
+  section { padding: 96px 0; }
+}
+
+/* ============================================================
+   Typography Cases
+   ============================================================ */
+.type-h0 {
+  font-family: var(--font-display);
+  font-size: clamp(72px, 14vw, 240px);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144, 'SOFT' 100;
+  color: var(--quartz-white);
+  mix-blend-mode: difference;
+}
+
+.type-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 7vw, 112px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144, 'SOFT' 100;
+  color: var(--fg);
+}
+
+.type-h2 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.2vw, 48px);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 90, 'SOFT' 80;
+  color: var(--fg);
+}
+
+.type-lead {
+  font-family: var(--font-body);
+  font-size: 20px;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+  font-weight: 400;
+  color: var(--fg-soft);
+}
+
+.type-body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  font-weight: 400;
+  color: var(--fg-soft);
+}
+
+.type-caption {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--fg-soft);
+}
+
+.type-spec {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+}
+
+.type-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  color: var(--fg-soft);
+}
+
+.type-timestamp {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  font-weight: 500;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   Hairlines
+   ============================================================ */
+.hairline {
+  border: 0;
+  border-top: 0.5px solid var(--rule);
+  margin: 0;
+}
+.hairline-v {
+  width: 0.5px;
+  background-color: var(--rule);
+}
+
+/* ============================================================
+   Running head — editorial
+   ============================================================ */
+.running-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 0.5px solid var(--rule);
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  backdrop-filter: none;
+  background-color: color-mix(in srgb, var(--bg) 85%, transparent);
+  padding-left: 80px;
+  padding-right: 80px;
+  transition: all var(--dur-medium) var(--ease-glacial);
+}
+@media (max-width: 768px) {
+  .running-head { padding-left: 20px; padding-right: 20px; }
+  .running-head .rh-center { display: none; }
+}
+.running-head .rh-mark {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  font-size: 14px;
+}
+.running-head .rh-meta,
+.running-head .rh-center {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+/* ============================================================
+   01 · HERO · Overture
+   ============================================================ */
+.hero-overture {
+  min-height: 100vh;
+  padding-top: 160px;
+  padding-bottom: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-meta-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 80px;
+  flex-wrap: wrap;
+}
+
+.hero-headline {
+  position: relative;
+  z-index: 3;
+}
+
+.hero-sub {
+  max-width: 560px;
+  margin-top: 40px;
+  padding-left: 24px;
+  border-left: 0.5px solid var(--rule);
+}
+
+.hero-bottom {
+  margin-top: 120px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  border-top: 0.5px solid var(--rule);
+  padding-top: 24px;
+}
+@media (max-width: 768px) {
+  .hero-bottom { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+}
+
+.hero-coordinate {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+.hero-coordinate .hc-label { display: block; opacity: 0.55; margin-bottom: 6px; }
+.hero-coordinate .hc-value { color: var(--fg); font-variant-numeric: tabular-nums; }
+
+/* Topographic SVG background layers (Glacier act) */
+.topographic-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ============================================================
+   02 · THE GLACIER · Origin
+   ============================================================ */
+.glacier-origin {
+  background-color: var(--ice-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.glacier-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+@media (max-width: 768px) {
+  .glacier-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+.glacier-figure {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background-color: var(--ice-paper);
+  border: 0.5px solid var(--rule);
+  overflow: hidden;
+}
+
+.glacier-caption {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+/* ============================================================
+   03 · 12,000 YEARS · Timeline
+   ============================================================ */
+.timeline-section {
+  position: relative;
+}
+
+.timeline-track {
+  position: relative;
+  height: 4px;
+  margin-top: 80px;
+  margin-bottom: 40px;
+}
+
+.timeline-track::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 0.5px;
+  background-color: var(--rule);
+}
+
+.timeline-markers {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+.timeline-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 90px;
+}
+.timeline-marker .tm-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--graphite-deep);
+  transform: rotate(45deg);
+  margin-bottom: 16px;
+}
+.timeline-marker.active .tm-dot {
+  background-color: var(--accent);
+}
+.timeline-marker .tm-year {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+.timeline-marker .tm-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--fg-soft);
+  text-align: center;
+}
+
+.timeline-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-top: 80px;
+}
+@media (max-width: 768px) {
+  .timeline-cards { grid-template-columns: 1fr; gap: 24px; }
+}
+.timeline-card {
+  border: 0.5px solid var(--rule);
+  padding: 32px 24px;
+  background-color: var(--ice-paper);
+}
+.timeline-card .tc-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 0.5px solid var(--rule);
+}
+
+/* ============================================================
+   04 · THE CAPTURE · Source (INVERSÃO 1)
+   ============================================================ */
+.capture-source {
+  background-color: var(--graphite-deep);
+  color: var(--ice-paper);
+  position: relative;
+  overflow: hidden;
+}
+.capture-source .type-h1,
+.capture-source .type-h2 { color: var(--ice-paper); }
+.capture-source .type-lead,
+.capture-source .type-body,
+.capture-source .type-caption,
+.capture-source .type-label { color: color-mix(in srgb, var(--ice-paper) 72%, transparent); }
+.capture-source .type-spec { color: var(--ice-paper); }
+.capture-source .hairline,
+.capture-source .hairline-v,
+.capture-source .glacier-figure,
+.capture-source .timeline-card,
+.capture-source .capture-grid > div { border-color: color-mix(in srgb, var(--ice-rule) 25%, transparent); }
+
+.capture-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+@media (max-width: 768px) {
+  .capture-grid { grid-template-columns: 1fr; gap: 48px; }
+}
+
+.capture-process {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 24px;
+  padding: 32px 0;
+  border-top: 0.5px solid color-mix(in srgb, var(--ice-rule) 25%, transparent);
+}
+.capture-process:last-child { border-bottom: 0.5px solid color-mix(in srgb, var(--ice-rule) 25%, transparent); }
+.capture-process .cp-num {
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-weight: 300;
+  color: var(--accent);
+  line-height: 1;
+  font-variation-settings: 'opsz' 144, 'SOFT' 100;
+}
+.capture-process .cp-body h3 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px 0;
+  color: var(--ice-paper);
+}
+
+.capture-image-slot {
+  aspect-ratio: 1 / 1.2;
+  background-color: color-mix(in srgb, var(--graphite-soft) 70%, var(--graphite-deep));
+  border: 0.5px solid color-mix(in srgb, var(--ice-rule) 20%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+.capture-image-slot::before {
+  content: '';
+  position: absolute;
+  inset: 24px;
+  border: 0.5px solid color-mix(in srgb, var(--ice-rule) 15%, transparent);
+}
+
+/* ============================================================
+   05 · THE BOTTLE · 3D hero
+   ============================================================ */
+.bottle-stage {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.bottle-canvas-wrap {
+  position: relative;
+  perspective: 1800px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+
+/* Bubbles canvas */
+.bubbles-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.7;
+}
+
+/* Bottle CSS 3D */
+.bottle-3d {
+  position: relative;
+  width: 68px;
+  height: 240px;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg) rotateX(-8deg);
+  z-index: 3;
+}
+
+.bottle-3d .facet {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 68px;
+  height: 240px;
+  margin-left: -34px;
+  backface-visibility: visible;
+  border: 0.5px solid color-mix(in srgb, var(--graphite-deep) 25%, transparent);
+  background: linear-gradient(
+    180deg,
+    var(--ice-paper) 0%,
+    var(--glacier-vapor) 22%,
+    var(--ice-shadow) 55%,
+    var(--graphite-soft) 100%
+  );
+  opacity: 0.94;
+}
+.bottle-3d .facet.f1 { transform: rotateY(0deg)   translateZ(34px); }
+.bottle-3d .facet.f2 { transform: rotateY(60deg)  translateZ(34px); background: linear-gradient(180deg, var(--ice-shadow), var(--glacier-blue) 45%, var(--graphite-soft) 100%); opacity: 0.85; }
+.bottle-3d .facet.f3 { transform: rotateY(120deg) translateZ(34px); background: linear-gradient(180deg, var(--glacier-vapor), var(--glacier-blue) 50%, var(--graphite-deep) 100%); opacity: 0.78; }
+.bottle-3d .facet.f4 { transform: rotateY(180deg) translateZ(34px); background: linear-gradient(180deg, var(--ice-shadow), var(--glacier-blue) 40%, var(--graphite-deep) 100%); opacity: 0.8; }
+.bottle-3d .facet.f5 { transform: rotateY(240deg) translateZ(34px); background: linear-gradient(180deg, var(--glacier-vapor), var(--glacier-blue) 50%, var(--graphite-soft) 100%); opacity: 0.85; }
+.bottle-3d .facet.f6 { transform: rotateY(300deg) translateZ(34px); background: linear-gradient(180deg, var(--ice-paper), var(--glacier-vapor) 40%, var(--ice-shadow) 100%); opacity: 0.94; }
+
+.bottle-3d .cap {
+  position: absolute;
+  left: 50%;
+  width: 68px;
+  height: 68px;
+  margin-left: -34px;
+  transform-style: preserve-3d;
+  background:
+    conic-gradient(
+      from 180deg,
+      var(--nordic-gold-dim) 0deg,
+      var(--nordic-gold) 60deg,
+      var(--ice-paper) 120deg,
+      var(--nordic-gold) 180deg,
+      var(--nordic-gold-dim) 240deg,
+      var(--nordic-gold) 300deg,
+      var(--nordic-gold-dim) 360deg
+    );
+  border: 0.5px solid var(--nordic-gold-dim);
+}
+.bottle-3d .cap.top { top: 0; transform: rotateX(90deg) translateZ(120px); }
+.bottle-3d .cap.bottom {
+  top: 0;
+  transform: rotateX(-90deg) translateZ(120px);
+  background:
+    radial-gradient(circle at center, var(--graphite-soft) 0%, var(--graphite-deep) 75%);
+  border-color: color-mix(in srgb, var(--graphite-deep) 80%, var(--ice-rule));
+}
+
+/* Bottle reveals — 6 reveals laterais (G1/F1 sync) */
+.bottle-reveals {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  padding: 40px 0;
+  z-index: 4;
+}
+.bottle-reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity var(--dur-medium) var(--ease-glacial),
+              transform var(--dur-medium) var(--ease-glacial);
+  max-width: 260px;
+}
+.bottle-reveal.active { opacity: 1; transform: translateY(0); }
+.bottle-reveal.left  { justify-self: end;   text-align: right; }
+.bottle-reveal.right { justify-self: start; text-align: left;  }
+.bottle-reveal .br-heading {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 144, 'SOFT' 100;
+  margin-bottom: 8px;
+  color: var(--fg);
+}
+.bottle-reveal .br-spec {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 768px) {
+  .bottle-reveals { display: none; }
+}
+
+/* ============================================================
+   06 · ANATOMY · Spec sheet
+   ============================================================ */
+.anatomy-section {
+  background-color: var(--ice-shadow);
+  position: relative;
+}
+[data-grid-density="dense"].anatomy-section .paper-grid { opacity: 1; }
+
+.anatomy-layout {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+  margin-top: 64px;
+}
+
+.anatomy-figure {
+  grid-column: 1 / span 5;
+  aspect-ratio: 3 / 4;
+  background-color: var(--ice-paper);
+  border: 0.5px solid var(--rule);
+  padding: 40px;
+  position: relative;
+}
+@media (max-width: 1024px) { .anatomy-figure { grid-column: 1 / span 12; } }
+
+.anatomy-copy {
+  grid-column: 7 / span 6;
+}
+@media (max-width: 1024px) { .anatomy-copy { grid-column: 1 / span 12; } }
+
+.drop-cap::first-letter {
+  font-family: var(--font-display);
+  font-size: 5em;
+  line-height: 0.88;
+  float: left;
+  margin: 8px 14px 0 0;
+  color: var(--accent);
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144, 'SOFT' 100;
+}
+
+.spec-sheet {
+  margin-top: 40px;
+}
+.spec-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 24px;
+  padding: 14px 0;
+  border-top: 0.5px solid var(--rule);
+  align-items: baseline;
+}
+.spec-row:last-child { border-bottom: 0.5px solid var(--rule); }
+.spec-row .sr-label { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-soft); }
+.spec-row .sr-value { font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--fg); }
+
+/* ============================================================
+   07 · MINERALOGY · Radar
+   ============================================================ */
+.mineralogy-section {
+  position: relative;
+}
+
+.radar-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  margin-top: 64px;
+}
+@media (max-width: 768px) {
+  .radar-layout { grid-template-columns: 1fr; gap: 48px; }
+}
+
+.radar-wrap {
+  aspect-ratio: 1 / 1;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+}
+
+.radar-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.radar-axis { stroke: var(--rule); stroke-width: 0.5; }
+.radar-ring { fill: none; stroke: var(--rule); stroke-width: 0.5; }
+.radar-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  fill: var(--fg-soft);
+}
+.radar-value {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.radar-polygon {
+  fill: color-mix(in srgb, var(--glacier-blue) 35%, transparent);
+  stroke: var(--graphite-deep);
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+  stroke-dasharray: 1800;
+  stroke-dashoffset: 1800;
+}
+.radar-point {
+  fill: var(--accent);
+  stroke: var(--graphite-deep);
+  stroke-width: 0.5;
+  opacity: 0;
+  transition: opacity var(--dur-short) var(--ease-glacial);
+}
+
+/* Mineral list */
+.mineral-list {
+  display: grid;
+  gap: 0;
+}
+.mineral-row {
+  display: grid;
+  grid-template-columns: 160px 1fr auto;
+  align-items: baseline;
+  gap: 24px;
+  padding: 20px 0;
+  border-top: 0.5px solid var(--rule);
+}
+.mineral-row:last-child { border-bottom: 0.5px solid var(--rule); }
+.mineral-row .mr-name { font-family: var(--font-display); font-size: 20px; font-weight: 400; color: var(--fg); }
+.mineral-row .mr-symbol { font-family: var(--font-mono); font-size: 11px; color: var(--fg-soft); text-transform: uppercase; letter-spacing: 0.1em; }
+.mineral-row .mr-value { font-family: var(--font-mono); font-size: 14px; color: var(--fg); font-variant-numeric: tabular-nums; }
+
+/* ============================================================
+   08 · TDS 145 · Big number (INVERSÃO 2)
+   ============================================================ */
+.tds-section {
+  background-color: var(--graphite-deep);
+  color: var(--ice-paper);
+  position: relative;
+  padding: 240px 0;
+  overflow: hidden;
+}
+.tds-section .type-h1,
+.tds-section .type-h2 { color: var(--ice-paper); }
+.tds-section .type-body,
+.tds-section .type-caption,
+.tds-section .type-label { color: color-mix(in srgb, var(--ice-paper) 72%, transparent); }
+.tds-section .hairline { border-color: color-mix(in srgb, var(--ice-rule) 25%, transparent); }
+
+.tds-big {
+  font-family: var(--font-display);
+  font-size: clamp(180px, 30vw, 520px);
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144, 'SOFT' 100;
+  color: var(--ice-paper);
+  text-align: center;
+  position: relative;
+}
+.tds-big sup {
+  font-family: var(--font-mono);
+  font-size: 0.09em;
+  vertical-align: top;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 500;
+  margin-left: 20px;
+  top: 0.8em;
+  position: relative;
+}
+
+.tds-caption {
+  text-align: center;
+  max-width: 640px;
+  margin: 40px auto 0;
+}
+
+.tds-foot {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-top: 120px;
+  padding-top: 40px;
+  border-top: 0.5px solid color-mix(in srgb, var(--ice-rule) 25%, transparent);
+}
+@media (max-width: 768px) { .tds-foot { grid-template-columns: repeat(2, 1fr); } }
+.tds-foot-item .tfi-label { opacity: 0.55; display: block; margin-bottom: 8px; }
+.tds-foot-item .tfi-value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--ice-paper);
+  letter-spacing: -0.01em;
+  font-variation-settings: 'opsz' 90, 'SOFT' 80;
+}
+
+/* ============================================================
+   09 · THE RITUAL · Usage
+   ============================================================ */
+.ritual-section {
+  position: relative;
+}
+
+.ritual-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+  margin-top: 64px;
+}
+@media (max-width: 768px) {
+  .ritual-layout { grid-template-columns: 1fr; gap: 48px; }
+}
+
+.ritual-steps {
+  display: grid;
+  gap: 0;
+}
+.ritual-step {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 24px;
+  padding: 28px 0;
+  border-top: 0.5px solid var(--rule);
+  align-items: baseline;
+}
+.ritual-step:last-child { border-bottom: 0.5px solid var(--rule); }
+.ritual-step .rs-num {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--accent);
+  line-height: 1;
+  font-variation-settings: 'opsz' 144, 'SOFT' 100;
+}
+.ritual-step .rs-heading {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 400;
+  margin-bottom: 8px;
+  color: var(--fg);
+}
+
+.ritual-figure {
+  aspect-ratio: 3 / 4;
+  background-color: var(--ice-shadow);
+  border: 0.5px solid var(--rule);
+  padding: 40px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Small crystal-glass svg illustration goes inside */
+
+/* ============================================================
+   10 · SIZES · 3 SKUs
+   ============================================================ */
+.sizes-section {
+  background-color: var(--ice-shadow);
+  position: relative;
+}
+
+.sizes-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 80px;
+  align-items: flex-end;
+}
+@media (max-width: 768px) {
+  .sizes-row { grid-template-columns: 1fr; gap: 64px; }
+}
+
+.sku {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  transition: opacity var(--dur-short) var(--ease-precise);
+  cursor: pointer;
+  will-change: transform, opacity;
+}
+/* Reduced-motion fallback: opacity only, no transforms */
+@media (prefers-reduced-motion: reduce) {
+  .sizes-row:hover .sku { opacity: 0.25; }
+  .sizes-row:hover .sku:hover { opacity: 1; }
+}
+
+.sku-bottle-wrap {
+  perspective: 1800px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 380px;
+}
+
+.sku-label {
+  text-align: center;
+  border-top: 0.5px solid var(--rule);
+  padding-top: 16px;
+  width: 100%;
+}
+.sku-label .skul-vol {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  display: block;
+  margin-bottom: 4px;
+  font-variation-settings: 'opsz' 90, 'SOFT' 80;
+}
+.sku-label .skul-dim {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--fg-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* SKU bottle scales */
+.sku.sm .bottle-3d { height: 170px; }
+.sku.sm .bottle-3d .facet { height: 170px; }
+.sku.md .bottle-3d { height: 240px; }
+.sku.md .bottle-3d .facet { height: 240px; }
+.sku.lg .bottle-3d { width: 90px; height: 340px; }
+.sku.lg .bottle-3d .facet { width: 90px; height: 340px; margin-left: -45px; }
+.sku.lg .bottle-3d .facet.f1 { transform: rotateY(0deg)   translateZ(45px); }
+.sku.lg .bottle-3d .facet.f2 { transform: rotateY(60deg)  translateZ(45px); }
+.sku.lg .bottle-3d .facet.f3 { transform: rotateY(120deg) translateZ(45px); }
+.sku.lg .bottle-3d .facet.f4 { transform: rotateY(180deg) translateZ(45px); }
+.sku.lg .bottle-3d .facet.f5 { transform: rotateY(240deg) translateZ(45px); }
+.sku.lg .bottle-3d .facet.f6 { transform: rotateY(300deg) translateZ(45px); }
+.sku.lg .bottle-3d .cap { width: 90px; height: 90px; margin-left: -45px; }
+.sku.lg .bottle-3d .cap.top { transform: rotateX(90deg) translateZ(170px); }
+.sku.lg .bottle-3d .cap.bottom { transform: rotateX(-90deg) translateZ(170px); }
+
+/* ============================================================
+   11 · DOSSIER · BibTeX paper
+   ============================================================ */
+.dossier-section {
+  position: relative;
+}
+
+.dossier-paper {
+  background-color: var(--ice-paper);
+  border: 0.5px solid var(--rule);
+  padding: 80px;
+  margin-top: 64px;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 768px) {
+  .dossier-paper { padding: 32px 24px; }
+}
+
+.dossier-head {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 32px;
+  border-bottom: 0.5px solid var(--rule);
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.bibtex {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--fg);
+  white-space: pre-wrap;
+  font-variant-numeric: tabular-nums;
+  border-left: 2px solid var(--accent);
+  padding-left: 20px;
+  margin: 32px 0;
+}
+
+.dossier-abstract {
+  column-count: 2;
+  column-gap: 40px;
+  margin-top: 32px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--fg-soft);
+}
+@media (max-width: 768px) {
+  .dossier-abstract { column-count: 1; }
+}
+
+.dossier-foot {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 0.5px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* ============================================================
+   12 · COLOPHON · Footer
+   ============================================================ */
+.colophon-section {
+  background-color: var(--graphite-deep);
+  color: var(--ice-paper);
+  padding: 120px 0 60px;
+  position: relative;
+}
+.colophon-section .type-h2,
+.colophon-section .type-h1 { color: var(--ice-paper); }
+.colophon-section .type-body,
+.colophon-section .type-caption,
+.colophon-section .type-label { color: color-mix(in srgb, var(--ice-paper) 65%, transparent); }
+
+.colophon-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  margin-top: 64px;
+  padding-bottom: 48px;
+  border-bottom: 0.5px solid color-mix(in srgb, var(--ice-rule) 25%, transparent);
+}
+@media (max-width: 768px) { .colophon-grid { grid-template-columns: 1fr 1fr; } }
+
+.colophon-grid h4 {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin: 0 0 16px 0;
+  font-weight: 500;
+}
+.colophon-grid ul { margin: 0; padding: 0; list-style: none; }
+.colophon-grid ul li { padding: 6px 0; font-family: var(--font-body); font-size: 14px; color: color-mix(in srgb, var(--ice-paper) 78%, transparent); }
+
+.colophon-final {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* ============================================================
+   Crosshair cursor (G7/F5) — desktop only
+   ============================================================ */
+.crosshair {
+  position: fixed;
+  top: 0; left: 0;
+  width: 24px; height: 24px;
+  pointer-events: none;
+  z-index: 60;
+  mix-blend-mode: difference;
+  opacity: 0;
+  transition: opacity var(--dur-micro) var(--ease-precise),
+              transform var(--dur-micro) var(--ease-precise);
+  transform: translate(-50%, -50%);
+}
+.crosshair::before,
+.crosshair::after {
+  content: '';
+  position: absolute;
+  background-color: var(--ice-rule);
+}
+.crosshair::before { left: 50%; top: 0; bottom: 0; width: 0.5px; margin-left: -0.25px; }
+.crosshair::after  { top: 50%; left: 0; right: 0; height: 0.5px; margin-top: -0.25px; }
+.crosshair-label {
+  position: absolute;
+  top: 100%;
+  left: 100%;
+  margin: 6px 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ice-rule);
+  opacity: 0;
+  transition: opacity var(--dur-micro) var(--ease-precise);
+}
+@media (pointer: fine) {
+  body:hover .crosshair { opacity: 0.9; }
+  body[data-cursor="measure"] .crosshair { transform: translate(-50%, -50%) scale(1.6); }
+  body[data-cursor="measure"] .crosshair-label { opacity: 1; }
+}
+@media (pointer: coarse) { .crosshair { display: none; } }
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+.fade-in { opacity: 0; transform: translateY(40px); }
+.fade-in.visible { opacity: 1; transform: translateY(0); transition: opacity var(--dur-medium) var(--ease-glacial), transform var(--dur-medium) var(--ease-glacial); }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0;
+  margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0);
+  white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Act transition overlay — cinematic wipe between data-act changes.
+   A single fixed layer drawn on top; clip-path is animated by GSAP when
+   body[data-act] flips. Background color comes from the NEW act's bg.
+   GPU-safe: only clip-path + background-color transitions. */
+.act-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background-color: var(--bg);
+  clip-path: inset(0 100% 0 0);
+  will-change: clip-path;
+}
+@media (prefers-reduced-motion: reduce) {
+  .act-overlay { display: none; }
+}
+
+/* Section anchor — subtle chapter number */
+.chapter {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+/* Long-form section intro */
+.section-intro {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 48px;
+  margin-bottom: 64px;
+  align-items: start;
+}
+@media (max-width: 768px) {
+  .section-intro { grid-template-columns: 1fr; gap: 24px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Paper millimeter grid — global -->
+<div class="paper-grid" aria-hidden="true"></div>
+
+<!-- Act-transition overlay — cinematic wipe between acts -->
+<div class="act-overlay" id="act-overlay" aria-hidden="true"></div>
+
+<!-- Cursor crosshair -->
+<div class="crosshair" aria-hidden="true">
+  <span class="crosshair-label">Ø 68 mm</span>
+</div>
+
+<!-- Running head — magazine-style -->
+<header class="running-head" role="banner">
+  <span class="rh-mark">ÆON</span>
+  <span class="rh-center">Vol. I · Issue 001 · Aletsch · MMXXVI</span>
+  <span class="rh-meta">FIG. <span id="rh-fig">01</span> / 12</span>
+</header>
+
+<!-- ============================================================ -->
+<!-- 01 · OVERTURE · Hero                                          -->
+<!-- ============================================================ -->
+<section class="hero-overture" data-section="01" data-act="glacier" data-fig="01">
+  <!-- Topographic layers (parallax) -->
+  <svg class="topographic-layer" data-speed="0.15" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="var(--graphite-soft)" stroke-width="0.8" opacity="0.18">
+      <path d="M-100,620 C200,560 420,680 720,600 S1200,520 1800,600"/>
+      <path d="M-100,680 C220,640 440,740 740,660 S1220,580 1800,660"/>
+      <path d="M-100,740 C240,720 460,800 760,720 S1240,640 1800,720"/>
+      <path d="M-100,800 C260,800 480,860 780,780 S1260,700 1800,780"/>
+    </g>
+  </svg>
+  <svg class="topographic-layer" data-speed="0.3" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="var(--graphite-soft)" stroke-width="1.0" opacity="0.28">
+      <path d="M-100,440 C260,360 520,520 840,440 S1320,340 1800,440"/>
+      <path d="M-100,500 C280,440 540,580 860,500 S1340,400 1800,500"/>
+      <path d="M-100,560 C300,520 560,640 880,560 S1360,460 1800,560"/>
+    </g>
+  </svg>
+  <svg class="topographic-layer" data-speed="0.5" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="var(--graphite-soft)" stroke-width="1.2" opacity="0.35">
+      <path d="M-100,260 C320,180 600,340 960,260 S1460,140 1800,260"/>
+      <path d="M-100,320 C340,260 620,400 980,320 S1480,200 1800,320"/>
+    </g>
+  </svg>
+  <svg class="topographic-layer" data-speed="0.75" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="var(--graphite-soft)" stroke-width="1.5" opacity="0.5">
+      <path d="M-100,120 C380,20 700,180 1080,120 S1540,0 1800,120"/>
+    </g>
+  </svg>
+
+  <div class="container">
+    <div class="hero-meta-top">
+      <div>
+        <span class="type-timestamp">46.5008°N · 8.0362°E · 2,847 M · MMXXVI</span>
+      </div>
+      <div>
+        <span class="type-label">Monograph · Vol. I · Issue 001</span>
+      </div>
+    </div>
+
+    <div class="hero-headline fade-in">
+      <span class="chapter">I · Overture</span>
+      <h1 class="type-h1" style="font-size: clamp(80px, 13vw, 220px); line-height: 0.86; max-width: 1100px;">Water,<br>written<br>in stone.</h1>
+    </div>
+
+    <div class="hero-sub fade-in">
+      <p class="type-lead">A twelve-thousand-year monograph of <em>Aletsch</em> glacial water — decanted at room temperature, bottled before language was. One source, six facets, one cylinder.</p>
+    </div>
+
+    <div class="hero-bottom">
+      <div class="hero-coordinate">
+        <span class="hc-label">Source</span>
+        <span class="hc-value">Aletsch Glacier</span>
+      </div>
+      <div class="hero-coordinate">
+        <span class="hc-label">Vintage</span>
+        <span class="hc-value">Pleistocene</span>
+      </div>
+      <div class="hero-coordinate">
+        <span class="hc-label">Altitude</span>
+        <span class="hc-value">2,847 m</span>
+      </div>
+      <div class="hero-coordinate">
+        <span class="hc-label">Isotope δ¹⁸O</span>
+        <span class="hc-value">−17.2 ‰</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 02 · THE GLACIER · Origin                                     -->
+<!-- ============================================================ -->
+<section class="glacier-origin" data-section="02" data-act="glacier" data-fig="02">
+  <div class="container">
+    <div class="section-intro fade-in">
+      <div>
+        <span class="chapter">II · Origin</span>
+        <h2 class="type-h1">The Glacier.</h2>
+      </div>
+      <div>
+        <p class="type-lead">At 2,847 metres, in the Valais Alps, ice bears no language. It keeps calendar by pressure, by compression, by the slow migration of minerals through crystal lattice. What we bottle is not produced. It is translated.</p>
+        <p class="type-body" style="margin-top: 24px;">Aletsch is Europe's longest glacier — 23 km of compressed snowfall, some layers still breathing air from before the agricultural revolution. We do not drill. We do not dynamite. We draw, quietly, from a single seasonal melt-fissure opened by the sun itself.</p>
+      </div>
+    </div>
+
+    <div class="glacier-grid">
+      <div class="fade-in">
+        <figure class="glacier-figure">
+          <!-- Inline SVG figure: stylised glacier cross-section -->
+          <svg viewBox="0 0 400 500" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;" aria-hidden="true">
+            <defs>
+              <pattern id="hatch" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
+                <rect width="2" height="4" fill="rgba(143,167,181,0.22)"/>
+              </pattern>
+            </defs>
+            <rect width="400" height="500" fill="none"/>
+            <!-- Ice layers -->
+            <path d="M 0,360 C 80,340 160,300 240,290 S 380,260 400,240 L 400,500 L 0,500 Z" fill="var(--glacier-vapor)" opacity="0.6"/>
+            <path d="M 0,380 C 80,368 160,340 240,322 S 380,300 400,280 L 400,500 L 0,500 Z" fill="var(--glacier-blue)" opacity="0.5"/>
+            <path d="M 0,410 C 80,400 160,380 240,368 S 380,348 400,336 L 400,500 L 0,500 Z" fill="var(--graphite-soft)" opacity="0.35"/>
+            <path d="M 0,460 L 400,440 L 400,500 L 0,500 Z" fill="var(--graphite-deep)" opacity="0.9"/>
+            <!-- Hatch for depth -->
+            <rect width="400" height="500" fill="url(#hatch)" opacity="0.45"/>
+            <!-- Scale markers -->
+            <g font-family="JetBrains Mono" font-size="9" fill="var(--graphite-soft)" letter-spacing="2">
+              <line x1="40" y1="40" x2="40" y2="460" stroke="var(--graphite-soft)" stroke-width="0.5"/>
+              <line x1="36" y1="60"  x2="44" y2="60"  stroke="var(--graphite-soft)" stroke-width="0.5"/>
+              <line x1="36" y1="150" x2="44" y2="150" stroke="var(--graphite-soft)" stroke-width="0.5"/>
+              <line x1="36" y1="250" x2="44" y2="250" stroke="var(--graphite-soft)" stroke-width="0.5"/>
+              <line x1="36" y1="350" x2="44" y2="350" stroke="var(--graphite-soft)" stroke-width="0.5"/>
+              <line x1="36" y1="440" x2="44" y2="440" stroke="var(--graphite-soft)" stroke-width="0.5"/>
+              <text x="52" y="64">0 M</text>
+              <text x="52" y="154">+500 M</text>
+              <text x="52" y="254">+1500 M</text>
+              <text x="52" y="354">+2500 M</text>
+              <text x="52" y="444">BEDROCK</text>
+            </g>
+            <!-- Fissure indicator -->
+            <g>
+              <path d="M 280,280 L 300,340 L 290,360" fill="none" stroke="var(--nordic-gold)" stroke-width="1"/>
+              <circle cx="280" cy="280" r="3" fill="var(--nordic-gold)"/>
+              <text x="308" y="342" font-family="JetBrains Mono" font-size="9" fill="var(--nordic-gold)" letter-spacing="1.5">FISSURE · 2,847 M</text>
+            </g>
+          </svg>
+        </figure>
+        <figcaption class="glacier-caption">
+          <span class="type-caption">FIG. 02 — Aletsch cross-section</span>
+          <span class="type-timestamp">DWG · 2026.001.02</span>
+        </figcaption>
+      </div>
+
+      <div class="fade-in">
+        <div class="type-spec" style="margin-bottom: 32px;">
+          <span class="type-label" style="display:block;margin-bottom:12px;">Field Note · 07:14 CET</span>
+          The mountain does the work. We carry weight, we carry patience, we carry nothing that cannot be folded back into stone. At 2,847 metres the air is thin enough to count syllables. We do not count.
+        </div>
+
+        <div class="spec-sheet">
+          <div class="spec-row"><span class="sr-label">Glacier</span><span class="sr-value">Aletsch — Grosser</span></div>
+          <div class="spec-row"><span class="sr-label">Length</span><span class="sr-value">23.0 km</span></div>
+          <div class="spec-row"><span class="sr-label">Max depth</span><span class="sr-value">≈ 900 m</span></div>
+          <div class="spec-row"><span class="sr-label">Catchment</span><span class="sr-value">Jungfrau-Aletsch (UNESCO)</span></div>
+          <div class="spec-row"><span class="sr-label">Canton</span><span class="sr-value">Valais · Switzerland</span></div>
+          <div class="spec-row"><span class="sr-label">Coordinates</span><span class="sr-value">46.5008°N · 8.0362°E</span></div>
+          <div class="spec-row"><span class="sr-label">Ice age (this lot)</span><span class="sr-value">~12,000 years (Pleistocene)</span></div>
+        </div>
+
+        <p class="type-body" style="margin-top: 40px;">The mountain did the work. We just moved it gently.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 03 · TIMELINE · 12,000 YEARS                                   -->
+<!-- ============================================================ -->
+<section class="timeline-section" data-section="03" data-act="glacier" data-fig="03">
+  <div class="container">
+    <div class="section-intro fade-in">
+      <div>
+        <span class="chapter">III · Vintage</span>
+        <h2 class="type-h1">12,000<br>years.</h2>
+      </div>
+      <div>
+        <p class="type-lead">Twelve thousand years of patience. Opened in seconds. What you drink was already water when writing was a rumour.</p>
+        <p class="type-body" style="margin-top: 24px;">A brief calendar of the lot you are holding — plotted against the drift of human time. The unit is not years. It is distance from silence.</p>
+      </div>
+    </div>
+
+    <div class="timeline-track fade-in">
+      <div class="timeline-markers">
+        <div class="timeline-marker active">
+          <span class="tm-dot"></span>
+          <span class="tm-year">-10,000</span>
+          <span class="tm-label">Snowfall</span>
+        </div>
+        <div class="timeline-marker">
+          <span class="tm-dot"></span>
+          <span class="tm-year">-8,000</span>
+          <span class="tm-label">Compression</span>
+        </div>
+        <div class="timeline-marker">
+          <span class="tm-dot"></span>
+          <span class="tm-year">-4,000</span>
+          <span class="tm-label">Crystallisation</span>
+        </div>
+        <div class="timeline-marker">
+          <span class="tm-dot"></span>
+          <span class="tm-year">-500</span>
+          <span class="tm-label">Mineralisation</span>
+        </div>
+        <div class="timeline-marker active">
+          <span class="tm-dot"></span>
+          <span class="tm-year">MMXXVI</span>
+          <span class="tm-label">Decanted</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-cards">
+      <article class="timeline-card fade-in">
+        <header class="tc-head">
+          <span class="type-label">Stage 01</span>
+          <span class="type-timestamp">~10,000 BCE</span>
+        </header>
+        <h3 class="type-h2" style="font-size:22px;margin:0 0 12px 0;">Snowfall</h3>
+        <p class="type-body">Flake after flake. A calendar with no pages. Each season laid down quietly on the season before.</p>
+      </article>
+
+      <article class="timeline-card fade-in">
+        <header class="tc-head">
+          <span class="type-label">Stage 02</span>
+          <span class="type-timestamp">~8,000 BCE</span>
+        </header>
+        <h3 class="type-h2" style="font-size:22px;margin:0 0 12px 0;">Compression</h3>
+        <p class="type-body">Air is squeezed into memory. 12m of snow becomes 1m of firn. Firn becomes glacial ice. Time, pressed.</p>
+      </article>
+
+      <article class="timeline-card fade-in">
+        <header class="tc-head">
+          <span class="type-label">Stage 03</span>
+          <span class="type-timestamp">~4,000 BCE</span>
+        </header>
+        <h3 class="type-h2" style="font-size:22px;margin:0 0 12px 0;">Crystallisation</h3>
+        <p class="type-body">Lattice reorganises. δ¹⁸O signature stabilises. The isotope becomes a fingerprint of vintage.</p>
+      </article>
+
+      <article class="timeline-card fade-in">
+        <header class="tc-head">
+          <span class="type-label">Stage 04</span>
+          <span class="type-timestamp">MMXXVI</span>
+        </header>
+        <h3 class="type-h2" style="font-size:22px;margin:0 0 12px 0;">Decanted</h3>
+        <p class="type-body">Drawn at 2,847 m. Decanted at room temperature. Bottled in ÆON·A001·MMXXVI·L0342.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 04 · THE CAPTURE · Source (INVERSÃO 1)                        -->
+<!-- ============================================================ -->
+<section class="capture-source" data-section="04" data-act="capture" data-fig="04">
+  <div class="container">
+    <div class="section-intro fade-in">
+      <div>
+        <span class="chapter" style="color: var(--accent);">IV · Capture</span>
+        <h2 class="type-h1">Not produced.<br>Translated.</h2>
+      </div>
+      <div>
+        <p class="type-lead">Drawn at 2,847 metres. Decanted at room temperature. Four movements, zero theatre, one source.</p>
+      </div>
+    </div>
+
+    <div class="capture-grid">
+      <div class="fade-in">
+        <div class="capture-process">
+          <span class="cp-num">01</span>
+          <div class="cp-body">
+            <h3>Approach</h3>
+            <p class="type-body">The team ascends in silence. No machinery above 2,400 m. The last 447 m are walked — cargo folded onto two mules and four backs.</p>
+          </div>
+        </div>
+        <div class="capture-process">
+          <span class="cp-num">02</span>
+          <div class="cp-body">
+            <h3>Draw</h3>
+            <p class="type-body">A single stainless siphon enters the seasonal fissure. No pump. No electricity. Gravity is the motor; patience is the dial.</p>
+          </div>
+        </div>
+        <div class="capture-process">
+          <span class="cp-num">03</span>
+          <div class="cp-body">
+            <h3>Decant</h3>
+            <p class="type-body">Water rests in uncoated crystal at 8°C. Sediment falls. Minerals hold. Nothing is added. Nothing is removed.</p>
+          </div>
+        </div>
+        <div class="capture-process">
+          <span class="cp-num">04</span>
+          <div class="cp-body">
+            <h3>Seal</h3>
+            <p class="type-body">Brushed aluminium closure. Lot laser-etched. <span class="type-spec" style="color: var(--accent);">ÆON · A001 · MMXXVI · L0342</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fade-in">
+        <div class="capture-image-slot">
+          <svg viewBox="0 0 400 480" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;" aria-hidden="true">
+            <defs>
+              <linearGradient id="bottleGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#C8D4DB" stop-opacity="0.9"/>
+                <stop offset="0.4" stop-color="#8FA7B5" stop-opacity="0.9"/>
+                <stop offset="1" stop-color="#0E1215" stop-opacity="0.95"/>
+              </linearGradient>
+            </defs>
+            <!-- Stylised siphon scene -->
+            <g stroke="#C8D4DB" stroke-width="0.6" fill="none" opacity="0.55">
+              <line x1="0" y1="120" x2="400" y2="120"/>
+              <line x1="0" y1="200" x2="400" y2="200"/>
+              <line x1="0" y1="280" x2="400" y2="280"/>
+              <line x1="0" y1="360" x2="400" y2="360"/>
+              <line x1="100" y1="0" x2="100" y2="480"/>
+              <line x1="200" y1="0" x2="200" y2="480"/>
+              <line x1="300" y1="0" x2="300" y2="480"/>
+            </g>
+            <!-- Fissure outline -->
+            <path d="M 120,20 C 180,120 160,260 220,420 L 240,460 L 260,420 C 220,280 260,140 220,20 Z"
+                  fill="#8FA7B5" opacity="0.2" stroke="#C8D4DB" stroke-width="0.5"/>
+            <!-- Siphon tube -->
+            <path d="M 200,120 Q 260,180 260,280 T 300,420" fill="none" stroke="#B69863" stroke-width="1.2"/>
+            <circle cx="200" cy="120" r="5" fill="#B69863"/>
+            <!-- Bottle silhouette at base -->
+            <rect x="280" y="380" width="40" height="60" fill="url(#bottleGrad)" stroke="#C8D4DB" stroke-width="0.5"/>
+            <rect x="286" y="370" width="28" height="12" fill="#B69863"/>
+            <!-- Labels -->
+            <g font-family="JetBrains Mono" font-size="9" letter-spacing="1.5" fill="#C8D4DB">
+              <text x="30" y="110">2,847 M</text>
+              <text x="30" y="190">2,600 M</text>
+              <text x="30" y="270">2,400 M</text>
+              <text x="30" y="350">2,100 M</text>
+              <text x="130" y="30" fill="#B69863">FISSURE</text>
+              <text x="270" y="460" fill="#B69863">A001 · L0342</text>
+            </g>
+          </svg>
+        </div>
+        <div style="margin-top: 16px; display:flex; justify-content:space-between;">
+          <span class="type-caption">FIG. 04 — Siphon schematic</span>
+          <span class="type-timestamp">DWG · 2026.001.04</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="hairline" style="margin-top: 96px; margin-bottom: 48px;">
+    <div style="display:flex; justify-content:space-between; flex-wrap: wrap; gap: 20px;">
+      <span class="type-label">Annotation · Field register</span>
+      <span class="type-spec" style="color: color-mix(in srgb, var(--ice-paper) 85%, transparent);">Observed at 46.5008°N · 8.0362°E · altitude 2,847 m · δ¹⁸O −17.2‰</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 05 · THE BOTTLE · 3D Hero                                     -->
+<!-- ============================================================ -->
+<section class="bottle-stage" data-section="05" data-act="capture" data-fig="05" id="bottle-stage">
+  <canvas class="bubbles-canvas" id="bubbles"></canvas>
+
+  <div class="container">
+    <div class="section-intro fade-in">
+      <div>
+        <span class="chapter">V · Vessel</span>
+        <h2 class="type-h1">A cylinder,<br>six facets,<br>one source.</h2>
+      </div>
+      <div>
+        <p class="type-lead">The bottle is a translation device. Hexagonal cross-section, cylindrical glass, 6 mm crystal wall. It reads the light the way the glacier reads the sun — quietly, and only once.</p>
+      </div>
+    </div>
+
+    <div class="bottle-canvas-wrap" id="bottle-canvas-wrap">
+      <div class="bottle-3d" id="bottle-hero" aria-label="Hexagonal cylinder, 6 facets, brushed aluminium cap.">
+        <span class="facet f1"></span>
+        <span class="facet f2"></span>
+        <span class="facet f3"></span>
+        <span class="facet f4"></span>
+        <span class="facet f5"></span>
+        <span class="facet f6"></span>
+        <span class="cap top"></span>
+        <span class="cap bottom"></span>
+      </div>
+
+      <!-- 6 reveals laterais, sync com rotação -->
+      <div class="bottle-reveals" aria-hidden="true">
+        <div class="bottle-reveal left" data-facet="1">
+          <h4 class="br-heading">Facet 01</h4>
+          <p class="br-spec">Ø 68 mm · front · laser-etched lot</p>
+        </div>
+        <div class="bottle-reveal right" data-facet="2">
+          <h4 class="br-heading">Facet 02</h4>
+          <p class="br-spec">60° · uncoated crystal · 6 mm wall</p>
+        </div>
+        <div class="bottle-reveal left" data-facet="3">
+          <h4 class="br-heading">Facet 03</h4>
+          <p class="br-spec">120° · δ¹⁸O signature −17.2‰</p>
+        </div>
+        <div class="bottle-reveal right" data-facet="4">
+          <h4 class="br-heading">Facet 04</h4>
+          <p class="br-spec">180° · rear · DOI · ÆON/2026.001</p>
+        </div>
+        <div class="bottle-reveal left" data-facet="5">
+          <h4 class="br-heading">Facet 05</h4>
+          <p class="br-spec">240° · TDS 145 mg/L · pH 7.4</p>
+        </div>
+        <div class="bottle-reveal right" data-facet="6">
+          <h4 class="br-heading">Facet 06</h4>
+          <p class="br-spec">300° · A001 · L0342 · Valais</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="hairline" style="margin-top: 64px; margin-bottom: 32px;">
+    <div style="display:flex; justify-content:space-between; flex-wrap: wrap; gap: 20px;">
+      <span class="type-label">FIG. 05 — Bottle, isometric</span>
+      <span class="type-timestamp">DWG · 2026.001.05 · L0342</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 06 · ANATOMY · Spec sheet                                      -->
+<!-- ============================================================ -->
+<section class="anatomy-section" data-section="06" data-act="lab" data-fig="06" data-grid-density="dense">
+  <div class="container">
+    <div class="section-intro fade-in">
+      <div>
+        <span class="chapter">VI · Anatomy</span>
+        <h2 class="type-h1">Minerals<br>in the margin.</h2>
+      </div>
+      <div>
+        <p class="type-lead">Silence in the center. Every specification below is observed, not argued. Lot ÆON·A001·MMXXVI·L0342, certified by Glacial Lab 01 · Valais.</p>
+      </div>
+    </div>
+
+    <div class="anatomy-layout">
+      <figure class="anatomy-figure fade-in">
+        <svg viewBox="0 0 360 480" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;" aria-hidden="true">
+          <!-- Exploded bottle diagram -->
+          <defs>
+            <linearGradient id="glassGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#F4F6F8"/>
+              <stop offset="0.5" stop-color="#C8D4DB"/>
+              <stop offset="1" stop-color="#2A3038"/>
+            </linearGradient>
+          </defs>
+          <g stroke="#D4DAE0" stroke-width="0.5" fill="none">
+            <line x1="180" y1="20" x2="180" y2="460"/>
+          </g>
+
+          <!-- CAP -->
+          <g>
+            <ellipse cx="180" cy="60" rx="36" ry="10" fill="#B69863"/>
+            <rect x="144" y="50" width="72" height="22" fill="#8C7348"/>
+            <ellipse cx="180" cy="50" rx="36" ry="10" fill="#B69863"/>
+            <!-- Leader line -->
+            <line x1="216" y1="60" x2="320" y2="60" stroke="#B69863" stroke-width="0.6"/>
+            <circle cx="216" cy="60" r="2" fill="#B69863"/>
+            <text x="328" y="56" font-family="JetBrains Mono" font-size="10" letter-spacing="1" fill="#2A3038">CAP — AL BRUSHED</text>
+            <text x="328" y="70" font-family="JetBrains Mono" font-size="8" letter-spacing="1" fill="#8FA7B5">ETCH · L0342</text>
+          </g>
+
+          <!-- NECK -->
+          <g>
+            <rect x="168" y="82" width="24" height="40" fill="url(#glassGrad)" stroke="#D4DAE0" stroke-width="0.5"/>
+            <line x1="192" y1="100" x2="320" y2="100" stroke="#2A3038" stroke-width="0.5"/>
+            <circle cx="192" cy="100" r="2" fill="#2A3038"/>
+            <text x="328" y="96" font-family="JetBrains Mono" font-size="10" letter-spacing="1" fill="#2A3038">NECK — 24 MM</text>
+          </g>
+
+          <!-- BODY (hex silhouette) -->
+          <g>
+            <polygon points="120,140 240,140 260,200 260,360 240,420 120,420 100,360 100,200" fill="url(#glassGrad)" stroke="#D4DAE0" stroke-width="0.5" opacity="0.88"/>
+            <line x1="100" y1="280" x2="20" y2="280" stroke="#2A3038" stroke-width="0.5"/>
+            <circle cx="100" cy="280" r="2" fill="#2A3038"/>
+            <text x="16" y="276" text-anchor="end" font-family="JetBrains Mono" font-size="10" letter-spacing="1" fill="#2A3038">BODY · Ø 68 MM</text>
+            <line x1="260" y1="300" x2="340" y2="300" stroke="#2A3038" stroke-width="0.5"/>
+            <circle cx="260" cy="300" r="2" fill="#2A3038"/>
+            <text x="346" y="296" font-family="JetBrains Mono" font-size="10" letter-spacing="1" fill="#2A3038">H · 240 MM</text>
+            <line x1="260" y1="340" x2="340" y2="340" stroke="#8C7348" stroke-width="0.5"/>
+            <text x="346" y="336" font-family="JetBrains Mono" font-size="9" letter-spacing="1" fill="#8C7348">WALL · 6 MM</text>
+          </g>
+
+          <!-- BASE -->
+          <g>
+            <ellipse cx="180" cy="430" rx="60" ry="10" fill="#2A3038"/>
+            <line x1="180" y1="440" x2="180" y2="468" stroke="#2A3038" stroke-width="0.5"/>
+            <text x="180" y="464" text-anchor="middle" font-family="JetBrains Mono" font-size="9" letter-spacing="1" fill="#8FA7B5">FIG. 06 · EXPLODED</text>
+          </g>
+        </svg>
+      </figure>
+
+      <div class="anatomy-copy fade-in">
+        <p class="type-body drop-cap">The bottle is not a container. It is the last instrument in a long measurement. Hexagonal cross-section keeps the hand oriented; cylindrical glass keeps the optics honest; 6 mm wall keeps the temperature slow. Every dimension is a decision, not a preference.</p>
+
+        <div class="spec-sheet">
+          <div class="spec-row"><span class="sr-label">Profile</span><span class="sr-value">Hexagonal · cylindrical glass</span></div>
+          <div class="spec-row"><span class="sr-label">Diameter</span><span class="sr-value">Ø 68 mm</span></div>
+          <div class="spec-row"><span class="sr-label">Height</span><span class="sr-value">H 240 mm</span></div>
+          <div class="spec-row"><span class="sr-label">Wall</span><span class="sr-value">6 mm · uncoloured crystal</span></div>
+          <div class="spec-row"><span class="sr-label">Neck</span><span class="sr-value">Ø 24 mm · polished</span></div>
+          <div class="spec-row"><span class="sr-label">Closure</span><span class="sr-value">Brushed aluminium · AL 5052</span></div>
+          <div class="spec-row"><span class="sr-label">Marking</span><span class="sr-value">Laser-etched lot · face 01</span></div>
+          <div class="spec-row"><span class="sr-label">Net volume</span><span class="sr-value">750 mL (reference)</span></div>
+          <div class="spec-row"><span class="sr-label">Tare weight</span><span class="sr-value">612 g</span></div>
+          <div class="spec-row"><span class="sr-label">Lot</span><span class="sr-value">ÆON · A001 · MMXXVI · L0342</span></div>
+        </div>
+
+        <p class="type-body" style="margin-top: 32px;">FIG. 03 — Hexagonal cross-section, cylindrical glass, 6 mm wall.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 07 · MINERALOGY · Radar                                        -->
+<!-- ============================================================ -->
+<section class="mineralogy-section" data-section="07" data-act="lab" data-fig="07">
+  <div class="container">
+    <div class="section-intro fade-in">
+      <div>
+        <span class="chapter">VII · Mineralogy</span>
+        <h2 class="type-h1">Pleistocene<br>fingerprint.</h2>
+      </div>
+      <div>
+        <p class="type-lead">Five axes of evidence: Ca · Mg · SiO₂ · pH · TDS. Soft hardness. Low conductivity. High patience. The polygon below is the shape of this lot.</p>
+        <p class="type-body" style="margin-top: 24px;">Not an average. Not a blend. A single draw, a single lot, a single signature. Any departure from this outline invalidates the vintage.</p>
+      </div>
+    </div>
+
+    <div class="radar-layout">
+      <div class="radar-wrap fade-in" id="radar-wrap">
+        <svg class="radar-svg" viewBox="0 0 400 400" id="radar-svg" aria-hidden="true">
+          <!-- Rings -->
+          <g>
+            <polygon class="radar-ring" points="200,60 321.6,135 274.9,280 125.1,280 78.4,135"/>
+            <polygon class="radar-ring" points="200,102 291.2,158 256.2,266 143.8,266 108.8,158"/>
+            <polygon class="radar-ring" points="200,144 260.8,181 237.4,252 162.6,252 139.2,181"/>
+            <polygon class="radar-ring" points="200,186 230.4,204 218.7,238 181.3,238 169.6,204"/>
+          </g>
+          <!-- Axes -->
+          <g>
+            <line class="radar-axis" x1="200" y1="200" x2="200" y2="60"/>
+            <line class="radar-axis" x1="200" y1="200" x2="321.6" y2="135"/>
+            <line class="radar-axis" x1="200" y1="200" x2="274.9" y2="280"/>
+            <line class="radar-axis" x1="200" y1="200" x2="125.1" y2="280"/>
+            <line class="radar-axis" x1="200" y1="200" x2="78.4" y2="135"/>
+          </g>
+          <!-- Labels -->
+          <g>
+            <text class="radar-label" x="200" y="46" text-anchor="middle">Ca²⁺</text>
+            <text class="radar-label" x="335" y="130" text-anchor="start">Mg²⁺</text>
+            <text class="radar-label" x="290" y="296" text-anchor="start">SiO₂</text>
+            <text class="radar-label" x="110" y="296" text-anchor="end">pH</text>
+            <text class="radar-label" x="62" y="130" text-anchor="end">TDS</text>
+          </g>
+          <!-- Polygon data (normalised values) -->
+          <!-- Ca 0.75, Mg 0.55, SiO₂ 0.42, pH 0.70, TDS 0.62 -->
+          <polygon id="radar-poly" class="radar-polygon" points="200,95 267.0,156 244.5,244 148.0,244 121.0,158"/>
+          <!-- Points -->
+          <g>
+            <circle class="radar-point" cx="200"   cy="95"  r="3" data-i="0"/>
+            <circle class="radar-point" cx="267"   cy="156" r="3" data-i="1"/>
+            <circle class="radar-point" cx="244.5" cy="244" r="3" data-i="2"/>
+            <circle class="radar-point" cx="148"   cy="244" r="3" data-i="3"/>
+            <circle class="radar-point" cx="121"   cy="158" r="3" data-i="4"/>
+          </g>
+          <!-- Values -->
+          <g class="radar-values">
+            <text class="radar-value" x="214" y="90">28 mg/L</text>
+            <text class="radar-value" x="276" y="152">8 mg/L</text>
+            <text class="radar-value" x="256" y="258">4.2 mg/L</text>
+            <text class="radar-value" x="96"  y="258" text-anchor="end">7.4</text>
+            <text class="radar-value" x="114" y="152" text-anchor="end">145 mg/L</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="mineral-list fade-in">
+        <div class="mineral-row">
+          <div>
+            <span class="mr-name">Calcium</span><br>
+            <span class="mr-symbol">Ca²⁺</span>
+          </div>
+          <span class="type-body">Structural. Rounds the mouthfeel.</span>
+          <span class="mr-value">28 mg/L</span>
+        </div>
+        <div class="mineral-row">
+          <div>
+            <span class="mr-name">Magnesium</span><br>
+            <span class="mr-symbol">Mg²⁺</span>
+          </div>
+          <span class="type-body">Mineral whisper. Lengthens the finish.</span>
+          <span class="mr-value">8 mg/L</span>
+        </div>
+        <div class="mineral-row">
+          <div>
+            <span class="mr-name">Silica</span><br>
+            <span class="mr-symbol">SiO₂</span>
+          </div>
+          <span class="type-body">Cold-stone memory. Quartz echo.</span>
+          <span class="mr-value">4.2 mg/L</span>
+        </div>
+        <div class="mineral-row">
+          <div>
+            <span class="mr-name">Sodium</span><br>
+            <span class="mr-symbol">Na⁺</span>
+          </div>
+          <span class="type-body">Trace. Balances the bicarbonate.</span>
+          <span class="mr-value">1.8 mg/L</span>
+        </div>
+        <div class="mineral-row">
+          <div>
+            <span class="mr-name">Bicarbonate</span><br>
+            <span class="mr-symbol">HCO₃⁻</span>
+          </div>
+          <span class="type-body">Buffer. Holds the pH quiet.</span>
+          <span class="mr-value">102 mg/L</span>
+        </div>
+        <div class="mineral-row">
+          <div>
+            <span class="mr-name">pH</span><br>
+            <span class="mr-symbol">— unitless</span>
+          </div>
+          <span class="type-body">Near neutral. Slightly basic.</span>
+          <span class="mr-value">7.4</span>
+        </div>
+        <div class="mineral-row">
+          <div>
+            <span class="mr-name">Conductivity</span><br>
+            <span class="mr-symbol">µS/cm</span>
+          </div>
+          <span class="type-body">Low load. Clean canvas.</span>
+          <span class="mr-value">205</span>
+        </div>
+        <div class="mineral-row">
+          <div>
+            <span class="mr-name">Hardness</span><br>
+            <span class="mr-symbol">°dH</span>
+          </div>
+          <span class="type-body">Soft. Classification: <em>weich</em>.</span>
+          <span class="mr-value">9</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 08 · TDS 145 · Big number (INVERSÃO 2)                         -->
+<!-- ============================================================ -->
+<section class="tds-section" data-section="08" data-act="inverted" data-fig="08">
+  <div class="container">
+    <div style="text-align:center;" class="fade-in">
+      <span class="chapter" style="color: var(--accent);">VIII · Signature</span>
+    </div>
+
+    <div class="fade-in">
+      <h2 class="tds-big">145<sup>mg/L</sup></h2>
+    </div>
+
+    <div class="tds-caption fade-in">
+      <p class="type-lead" style="color: color-mix(in srgb, var(--ice-paper) 85%, transparent);">Total Dissolved Solids. The summary of minerals the glacier trusted us to carry. Soft, slow, Pleistocene.</p>
+    </div>
+
+    <div class="tds-foot fade-in">
+      <div class="tds-foot-item">
+        <span class="type-label tfi-label">pH</span>
+        <span class="tfi-value">7.4</span>
+      </div>
+      <div class="tds-foot-item">
+        <span class="type-label tfi-label">δ¹⁸O</span>
+        <span class="tfi-value">−17.2 ‰</span>
+      </div>
+      <div class="tds-foot-item">
+        <span class="type-label tfi-label">Hardness</span>
+        <span class="tfi-value">9 °dH</span>
+      </div>
+      <div class="tds-foot-item">
+        <span class="type-label tfi-label">Conductivity</span>
+        <span class="tfi-value">205 µS/cm</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 09 · THE RITUAL · Usage                                        -->
+<!-- ============================================================ -->
+<section class="ritual-section" data-section="09" data-act="you" data-fig="09">
+  <div class="container">
+    <div class="section-intro fade-in">
+      <div>
+        <span class="chapter">IX · Ritual</span>
+        <h2 class="type-h1">Serve, slowly.</h2>
+      </div>
+      <div>
+        <p class="type-lead">The oldest thing you'll drink today asks for very little. Two hands, one glass, no ice. It will keep whatever time you give it.</p>
+      </div>
+    </div>
+
+    <div class="ritual-layout">
+      <div class="ritual-steps fade-in">
+        <div class="ritual-step">
+          <span class="rs-num">01</span>
+          <div>
+            <h3 class="rs-heading">Temperature</h3>
+            <p class="type-body">Serve at 8 °C. Not colder. Cold mutes the mineral voice; warmth rushes it. 8 °C is the room Aletsch left open.</p>
+          </div>
+        </div>
+        <div class="ritual-step">
+          <span class="rs-num">02</span>
+          <div>
+            <h3 class="rs-heading">Vessel</h3>
+            <p class="type-body">Uncoloured crystal. Anything coloured overwrites the reading. Avoid plastic; avoid metal; avoid perfume on the rim.</p>
+          </div>
+        </div>
+        <div class="ritual-step">
+          <span class="rs-num">03</span>
+          <div>
+            <h3 class="rs-heading">Ice</h3>
+            <p class="type-body">None. Ice is a second water, with its own opinions. It will always win an argument you didn't start.</p>
+          </div>
+        </div>
+        <div class="ritual-step">
+          <span class="rs-num">04</span>
+          <div>
+            <h3 class="rs-heading">Pace</h3>
+            <p class="type-body">Small, unhurried sips. The finish is longer than you expect. Give it room. Give it silence, if you can.</p>
+          </div>
+        </div>
+        <div class="ritual-step">
+          <span class="rs-num">05</span>
+          <div>
+            <h3 class="rs-heading">Pair</h3>
+            <p class="type-body">Dry cheese, cured fish, stone fruit, or nothing at all. Nothing at all is the honest default.</p>
+          </div>
+        </div>
+      </div>
+
+      <figure class="ritual-figure fade-in">
+        <svg viewBox="0 0 320 400" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;" aria-hidden="true">
+          <defs>
+            <linearGradient id="glassG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#FBFCFD" stop-opacity="0.6"/>
+              <stop offset="0.5" stop-color="#C8D4DB" stop-opacity="0.9"/>
+              <stop offset="1" stop-color="#8FA7B5" stop-opacity="0.8"/>
+            </linearGradient>
+            <linearGradient id="waterG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#C8D4DB" stop-opacity="0.8"/>
+              <stop offset="1" stop-color="#2A3038" stop-opacity="0.9"/>
+            </linearGradient>
+          </defs>
+          <!-- Glass silhouette -->
+          <path d="M 100,80 L 220,80 L 230,380 L 90,380 Z" fill="url(#glassG)" stroke="#D4DAE0" stroke-width="0.6"/>
+          <!-- Water fill -->
+          <path d="M 108,210 L 212,210 L 225,376 L 95,376 Z" fill="url(#waterG)"/>
+          <!-- Rim highlight -->
+          <path d="M 100,80 L 220,80" stroke="#FBFCFD" stroke-width="1" opacity="0.9"/>
+          <!-- Meniscus -->
+          <path d="M 108,210 Q 160,222 212,210" fill="none" stroke="#FBFCFD" stroke-width="0.5"/>
+          <!-- Drop callouts -->
+          <g font-family="JetBrains Mono" font-size="9" letter-spacing="1.5" fill="#2A3038">
+            <line x1="220" y1="80" x2="280" y2="80" stroke="#B69863" stroke-width="0.5"/>
+            <text x="288" y="76" fill="#8C7348">RIM · UNCOATED</text>
+            <line x1="220" y1="210" x2="280" y2="210" stroke="#B69863" stroke-width="0.5"/>
+            <text x="288" y="206" fill="#8C7348">FILL · 40%</text>
+            <line x1="90" y1="380" x2="30" y2="380" stroke="#B69863" stroke-width="0.5"/>
+            <text x="22" y="376" text-anchor="end" fill="#8C7348">BASE · 8°C</text>
+          </g>
+        </svg>
+      </figure>
+    </div>
+
+    <hr class="hairline" style="margin-top: 80px; margin-bottom: 32px;">
+    <div style="display:flex; justify-content:space-between; flex-wrap: wrap; gap: 20px;">
+      <span class="type-caption">Serving temperature: 8 °C. Vessel: uncoloured crystal. Ice: none.</span>
+      <span class="type-timestamp">RITUAL · 2026.001.09</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 10 · SIZES · 3 SKUs                                            -->
+<!-- ============================================================ -->
+<section class="sizes-section" data-section="10" data-act="you" data-fig="10">
+  <div class="container">
+    <div class="section-intro fade-in">
+      <div>
+        <span class="chapter">X · Sizes</span>
+        <h2 class="type-h1">Three measures.<br>One water.</h2>
+      </div>
+      <div>
+        <p class="type-lead">Travel, table, decanter. The cylinder scales in silence. Each SKU holds the same lot and the same promise — only the number changes.</p>
+      </div>
+    </div>
+
+    <div class="sizes-row fade-in">
+      <!-- 330 ml -->
+      <div class="sku sm">
+        <div class="sku-bottle-wrap">
+          <div class="bottle-3d">
+            <span class="facet f1"></span>
+            <span class="facet f2"></span>
+            <span class="facet f3"></span>
+            <span class="facet f4"></span>
+            <span class="facet f5"></span>
+            <span class="facet f6"></span>
+            <span class="cap top" style="transform: rotateX(90deg) translateZ(85px);"></span>
+            <span class="cap bottom" style="transform: rotateX(-90deg) translateZ(85px);"></span>
+          </div>
+        </div>
+        <div class="sku-label">
+          <span class="skul-vol">330 mL</span>
+          <span class="skul-dim">Travel · Ø 52 mm · H 170 mm</span>
+        </div>
+      </div>
+
+      <!-- 750 ml -->
+      <div class="sku md">
+        <div class="sku-bottle-wrap">
+          <div class="bottle-3d">
+            <span class="facet f1"></span>
+            <span class="facet f2"></span>
+            <span class="facet f3"></span>
+            <span class="facet f4"></span>
+            <span class="facet f5"></span>
+            <span class="facet f6"></span>
+            <span class="cap top"></span>
+            <span class="cap bottom"></span>
+          </div>
+        </div>
+        <div class="sku-label">
+          <span class="skul-vol">750 mL</span>
+          <span class="skul-dim">Table · Ø 68 mm · H 240 mm</span>
+        </div>
+      </div>
+
+      <!-- 1500 ml -->
+      <div class="sku lg">
+        <div class="sku-bottle-wrap">
+          <div class="bottle-3d">
+            <span class="facet f1"></span>
+            <span class="facet f2"></span>
+            <span class="facet f3"></span>
+            <span class="facet f4"></span>
+            <span class="facet f5"></span>
+            <span class="facet f6"></span>
+            <span class="cap top"></span>
+            <span class="cap bottom"></span>
+          </div>
+        </div>
+        <div class="sku-label">
+          <span class="skul-vol">1.5 L</span>
+          <span class="skul-dim">Decanter · Ø 90 mm · H 340 mm</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="hairline" style="margin-top: 96px; margin-bottom: 32px;">
+    <div style="display:flex; justify-content:space-between; flex-wrap: wrap; gap: 20px;">
+      <span class="type-label">All SKUs · same lot · ÆON·A001·MMXXVI·L0342</span>
+      <span class="type-timestamp">DWG · 2026.001.10</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 11 · DOSSIER · BibTeX paper                                    -->
+<!-- ============================================================ -->
+<section class="dossier-section" data-section="11" data-act="lab" data-fig="11">
+  <div class="container">
+    <div class="section-intro fade-in">
+      <div>
+        <span class="chapter">XI · Dossier</span>
+        <h2 class="type-h1">The oldest<br>thing you'll<br>drink today.</h2>
+      </div>
+      <div>
+        <p class="type-lead">One-page monograph. Citation below, in case anyone asks where it came from. They will.</p>
+      </div>
+    </div>
+
+    <article class="dossier-paper fade-in">
+      <header class="dossier-head">
+        <div>
+          <span class="type-label">Monograph</span><br>
+          <span class="type-h2" style="font-size: 28px; margin-top: 6px; display: block;">ÆON · Vol. I · Issue 001</span>
+        </div>
+        <div style="text-align:right;">
+          <span class="type-label">DOI</span><br>
+          <span class="type-spec">10.AEON/2026.001.ALETSCH</span>
+        </div>
+      </header>
+
+      <pre class="bibtex">@article{aeon2026,
+  title    = {Water, written in stone: a twelve-thousand-year monograph},
+  source   = {Aletsch Glacier, Valais, Switzerland},
+  lot      = {ÆON·A001·MMXXVI·L0342},
+  vintage  = {Pleistocene, ~12{,}000 BP},
+  altitude = {2847 m},
+  coord    = {46.5008°N, 8.0362°E},
+  TDS      = {145 mg/L},
+  pH       = {7.4},
+  isotope  = {δ¹⁸O −17.2‰},
+  vessel   = {uncoloured crystal, 6 mm wall, hex profile},
+  closure  = {brushed aluminium, laser-etched},
+  year     = {2026},
+  publisher= {Glacial Lab 01, Valais},
+  doi      = {10.AEON/2026.001.ALETSCH},
+  note     = {Decanted at room temperature. Not produced — translated.}
+}</pre>
+
+      <div class="dossier-abstract">
+        <p><strong>Abstract.</strong> This lot documents a single seasonal draw from the Aletsch Glacier, Valais, at 2,847 m of altitude. The ice layer of origin is approximately 12,000 years old, carrying a δ¹⁸O signature of −17.2‰ consistent with late Pleistocene alpine accumulation.</p>
+        <p>Water was gathered by gravity siphon, without pumping or thermal treatment, decanted in uncoated crystal at 8 °C, and bottled under nitrogen headspace into a hexagonal cylindrical vessel of 6 mm crystal wall. Total Dissolved Solids measured at 145 mg/L; bicarbonate buffer 102 mg/L; pH 7.4.</p>
+        <p>All SKUs (330 mL · 750 mL · 1.5 L) share the same lot identifier. Each closure is individually etched. Each bottle is a single citation — of a mountain, of a millennium, of a very patient calendar.</p>
+        <p style="color: var(--accent);">Not produced. Translated.</p>
+      </div>
+
+      <footer class="dossier-foot">
+        <span class="type-caption">FIG. 11 — Monograph · printed on calcium carbonate, bound by hand, sealed in Glacial Lab 01.</span>
+        <span class="type-timestamp">LAB · 01 · VALAIS · MMXXVI</span>
+      </footer>
+    </article>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 12 · COLOPHON · Footer                                         -->
+<!-- ============================================================ -->
+<section class="colophon-section" data-section="12" data-act="inverted" data-fig="12">
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items: flex-end; flex-wrap: wrap; gap: 32px;">
+      <div class="fade-in">
+        <span class="chapter" style="color: var(--accent);">XII · Colophon</span>
+        <h2 class="type-h1">ÆON.</h2>
+      </div>
+      <div class="fade-in" style="text-align:right;">
+        <span class="type-label" style="display:block;margin-bottom:8px;">This issue</span>
+        <span class="type-spec" style="color: var(--ice-paper);">Vol. I · Issue 001 · Aletsch · MMXXVI · L0342</span>
+      </div>
+    </div>
+
+    <div class="colophon-grid fade-in">
+      <div>
+        <h4>Index</h4>
+        <ul>
+          <li>I · Overture</li>
+          <li>II · The Glacier</li>
+          <li>III · Twelve Thousand Years</li>
+          <li>IV · The Capture</li>
+          <li>V · The Vessel</li>
+          <li>VI · Anatomy</li>
+          <li>VII · Mineralogy</li>
+          <li>VIII · Signature (TDS 145)</li>
+          <li>IX · Ritual</li>
+          <li>X · Sizes</li>
+          <li>XI · Dossier</li>
+          <li>XII · Colophon</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Lab</h4>
+        <ul>
+          <li>Glacial Lab 01</li>
+          <li>Valais · CH</li>
+          <li>46.5008°N · 8.0362°E</li>
+          <li>DOI · 10.AEON/2026.001</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Typography</h4>
+        <ul>
+          <li>Fraunces · display</li>
+          <li>Inter · body</li>
+          <li>JetBrains Mono · spec</li>
+          <li>Paper grid · 1 mm / 5 mm / 10 mm</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li>glacial-lab-01@aeon.water</li>
+          <li>press@aeon.water</li>
+          <li>registrar · 10.AEON</li>
+          <li>Bottled in Valais</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="colophon-final fade-in">
+      <span class="type-caption" style="color: color-mix(in srgb, var(--ice-paper) 65%, transparent);">Bottled in Glacial Lab 01, Valais. This lot: ÆON·A001·MMXXVI·L0342.</span>
+      <span class="type-timestamp">MMXXVI · COPYRIGHT · ÆON</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     JS · Lenis + GSAP + ScrollTrigger + Canvas bubbles
+     ============================================================ -->
+<script>
+(function () {
+  'use strict';
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = window.matchMedia('(max-width: 767.98px)').matches;
+
+  /* ============ LENIS SMOOTH SCROLL ============ */
+  let lenis = null;
+  if (!prefersReduced && typeof Lenis !== 'undefined') {
+    lenis = new Lenis({
+      duration: isMobile ? 1.0 : 1.4,
+      lerp: isMobile ? 0.12 : 0.08,
+      smoothTouch: false,
+      easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+    });
+    function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+  }
+
+  /* ============ GSAP + SCROLLTRIGGER ============ */
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+
+    if (lenis) {
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+      gsap.ticker.lagSmoothing(0);
+    }
+
+    /* Act switcher — drive CSS vars via body[data-act] + cinematic wipe
+       Swaps body[data-act] AND plays a clip-path wipe via .act-overlay.
+       Color of the wipe = bg of the incoming act (feels like the ink runs
+       across the page before the new chapter settles). */
+    const sections    = document.querySelectorAll('section[data-act]');
+    const actOverlay  = document.getElementById('act-overlay');
+    const actColors   = {
+      glacier:  '#F4F6F8',   // ice-paper
+      capture:  '#0E1215',   // graphite-deep
+      lab:      '#F4F6F8',   // ice-paper
+      inverted: '#0E1215',   // graphite-deep
+      you:      '#FBFCFD'    // quartz-white
+    };
+    let lastAct = null;
+    let overlayTween = null;
+    function setAct(act, fig) {
+      if (fig) document.getElementById('rh-fig').textContent = fig;
+      if (act === lastAct) return;
+      const prev = lastAct;
+      lastAct = act;
+      document.body.setAttribute('data-act', act);
+      if (!actOverlay || prefersReduced || !prev) return;
+      /* wipe only when transitioning between acts with different bg */
+      if (actColors[prev] === actColors[act]) return;
+      if (overlayTween) overlayTween.kill();
+      actOverlay.style.backgroundColor = actColors[act] || 'var(--bg)';
+      gsap.set(actOverlay, { clipPath: 'inset(0 100% 0 0)' });
+      overlayTween = gsap.timeline()
+        .to(actOverlay, {
+          clipPath: 'inset(0 0% 0 0)',
+          duration: 0.45,
+          ease: 'cubic-bezier(0.16, 1, 0.3, 1)'   // glacial
+        })
+        .to(actOverlay, {
+          clipPath: 'inset(0 0 0 100%)',
+          duration: 0.45,
+          ease: 'cubic-bezier(0.16, 1, 0.3, 1)'
+        })
+        .set(actOverlay, { clipPath: 'inset(0 100% 0 0)' });
+    }
+    sections.forEach(section => {
+      const act = section.getAttribute('data-act');
+      const fig = section.getAttribute('data-fig') || '';
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 55%',
+        end: 'bottom 45%',
+        onEnter:     () => setAct(act, fig),
+        onEnterBack: () => setAct(act, fig)
+      });
+    });
+
+    /* Fade-in batch */
+    const fadeIns = document.querySelectorAll('.fade-in');
+    ScrollTrigger.batch(fadeIns, {
+      start: 'top 85%',
+      onEnter: batch => gsap.to(batch, {
+        opacity: 1,
+        y: 0,
+        duration: 0.9,
+        ease: 'power3.out',
+        stagger: 0.06,
+        overwrite: true
+      })
+    });
+    gsap.set(fadeIns, { opacity: 0, y: 40 });
+
+    /* Topographic parallax (seção 02 hero only — uses Glacier act) */
+    if (!isMobile) {
+      gsap.utils.toArray('.topographic-layer').forEach(layer => {
+        const speed = parseFloat(layer.dataset.speed || '0.3');
+        gsap.to(layer, {
+          yPercent: -speed * 40,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: layer.closest('section'),
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true
+          }
+        });
+      });
+    }
+
+    /* Bottle hero — scroll-driven 360° rotation + reveals sync (mineral easing) */
+    const bottle = document.getElementById('bottle-hero');
+    const bottleStage = document.getElementById('bottle-stage');
+    if (bottle && bottleStage && !prefersReduced && !isMobile) {
+      /* Mineral scrub modulator — remaps linear progress p∈[0,1] onto a
+         quasi-stepped curve with micro-pauses near each 60° facet boundary.
+         Each facet occupies ~16.66% of total scroll; we compress motion in
+         the middle 70% and relax it in the outer 30% → creates the sense
+         that the bottle "lands" on a face before the next turn.  */
+      function mineralRemap(p) {
+        const facet = 1 / 6;                       // 0.1666…
+        const idx   = Math.floor(p / facet);       // 0..5
+        const local = (p - idx * facet) / facet;   // 0..1 within current facet
+        /* ease for inner segment: power2.inOut-style — slow edges, faster middle */
+        const eased = local < 0.5
+          ? 2 * local * local
+          : 1 - Math.pow(-2 * local + 2, 2) / 2;
+        return (idx + eased) * facet;
+      }
+      const bottleState = { angle: 0 };
+      gsap.to(bottleState, {
+        angle: 360,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: bottleStage,
+          start: 'top top',
+          end: '+=200%',
+          pin: true,
+          scrub: 1.5,
+          anticipatePin: 1,
+          onUpdate: self => {
+            const p      = self.progress;
+            const pRemap = mineralRemap(p);
+            const angle  = pRemap * 360;
+            gsap.set(bottle, { rotationY: angle, transformOrigin: '50% 50%' });
+            const facetIndex = Math.floor(angle / 60) % 6 + 1;
+            document.querySelectorAll('.bottle-reveal').forEach(rev => {
+              rev.classList.toggle('active', parseInt(rev.dataset.facet, 10) === facetIndex);
+            });
+          }
+        }
+      });
+    } else if (bottle && !prefersReduced && isMobile) {
+      /* Mobile fallback — autoplay slow loop */
+      gsap.to(bottle, { rotationY: 360, duration: 20, repeat: -1, ease: 'none' });
+    }
+
+    /* Radar polygon reveal */
+    const radarPoly = document.getElementById('radar-poly');
+    const radarWrap = document.getElementById('radar-wrap');
+    if (radarPoly && radarWrap) {
+      ScrollTrigger.create({
+        trigger: radarWrap,
+        start: 'top 75%',
+        once: true,
+        onEnter: () => {
+          gsap.to(radarPoly, {
+            strokeDashoffset: 0,
+            duration: 1.8,
+            ease: 'power3.out'
+          });
+          gsap.to('.radar-point', {
+            opacity: 1,
+            duration: 0.4,
+            stagger: 0.08,
+            delay: 0.6,
+            ease: 'power2.out'
+          });
+        }
+      });
+    }
+
+    /* TDS big number — subtle scale-in */
+    gsap.utils.toArray('.tds-big').forEach(el => {
+      gsap.from(el, {
+        scale: 0.92,
+        opacity: 0,
+        duration: 1.6,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 75%' }
+      });
+    });
+  }
+
+  /* ============ BUBBLES CANVAS (Seção 05) ============
+     Density scales with scroll progress of section 05:
+       p=0 → 8 bubbles (resting)
+       p=1 → 50 bubbles (vapor at full turn)
+     Bubbles are pushed gradually (no instant re-pop). OFF on mobile/reduced. */
+  (function bubbles() {
+    const canvas = document.getElementById('bubbles');
+    if (!canvas || isMobile || prefersReduced) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const bubbles = [];
+    const COUNT_MIN = 8;
+    const COUNT_MAX = 50;
+    let   COUNT_TARGET = COUNT_MIN;
+
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function spawn() {
+      return {
+        x: Math.random() * W,
+        y: H + Math.random() * H,
+        r: 1 + Math.random() * 3,
+        v: 0.3 + Math.random() * 0.4,
+        a: 0.25 + Math.random() * 0.25
+      };
+    }
+    function init() {
+      resize();
+      bubbles.length = 0;
+      for (let i = 0; i < COUNT_MIN; i++) bubbles.push(spawn());
+    }
+    let running = false;
+    function tick() {
+      if (!running) return;
+      /* Gradual grow/shrink toward COUNT_TARGET (1 bubble per frame max) */
+      if (bubbles.length < COUNT_TARGET) {
+        bubbles.push(spawn());
+      } else if (bubbles.length > COUNT_TARGET) {
+        bubbles.pop();
+      }
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < bubbles.length; i++) {
+        const b = bubbles[i];
+        b.y -= b.v;
+        if (b.y < -10) { bubbles[i] = spawn(); continue; }
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200, 212, 219, ${b.a})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(tick);
+    }
+
+    /* Only run while section 05 is in viewport */
+    const stage = document.getElementById('bottle-stage');
+    if (!stage) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          if (!running) { running = true; init(); tick(); }
+        } else {
+          running = false;
+        }
+      });
+    }, { threshold: 0.1 });
+    io.observe(stage);
+    window.addEventListener('resize', () => { if (running) resize(); });
+
+    /* Tie density to section-05 scroll progress via ScrollTrigger */
+    if (typeof ScrollTrigger !== 'undefined') {
+      ScrollTrigger.create({
+        trigger: stage,
+        start: 'top bottom',
+        end:   'bottom top',
+        onUpdate: self => {
+          const p = self.progress;   // 0..1
+          COUNT_TARGET = Math.round(COUNT_MIN + (COUNT_MAX - COUNT_MIN) * p);
+        }
+      });
+    }
+  })();
+
+  /* ============ CROSSHAIR CURSOR ============ */
+  (function cursor() {
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+    const crosshair = document.querySelector('.crosshair');
+    const label = document.querySelector('.crosshair-label');
+    if (!crosshair) return;
+    let mx = 0, my = 0, cx = 0, cy = 0;
+    window.addEventListener('mousemove', (e) => {
+      mx = e.clientX; my = e.clientY;
+    });
+    function raf() {
+      cx += (mx - cx) * 0.22;
+      cy += (my - cy) * 0.22;
+      crosshair.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+      requestAnimationFrame(raf);
+    }
+    raf();
+    /* Hover on bottle → measure mode */
+    const bottleStage = document.getElementById('bottle-stage');
+    if (bottleStage) {
+      bottleStage.addEventListener('mouseenter', () => {
+        document.body.setAttribute('data-cursor', 'measure');
+        if (label) label.textContent = 'Ø 68 MM · H 240 MM';
+      });
+      bottleStage.addEventListener('mouseleave', () => {
+        document.body.removeAttribute('data-cursor');
+      });
+    }
+    /* Sizes → swap label on hover */
+    document.querySelectorAll('.sku').forEach(sku => {
+      sku.addEventListener('mouseenter', () => {
+        document.body.setAttribute('data-cursor', 'measure');
+        const dim = sku.querySelector('.skul-dim');
+        if (label && dim) label.textContent = dim.textContent;
+      });
+      sku.addEventListener('mouseleave', () => {
+        document.body.removeAttribute('data-cursor');
+      });
+    });
+  })();
+
+  /* ============ SKU MAGNETIC HOVER (Seção 10) ============
+     Hovered SKU lifts (-6px), tilts (rotateY 15°), scales (1.02);
+     siblings shrink (0.96) and dim (opacity 0.45). 420ms ease 'precise'.
+     Disabled on coarse pointer (mobile) and reduced motion. */
+  (function skuMagnetic() {
+    if (prefersReduced) return;
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+    if (typeof gsap === 'undefined') return;
+    const row  = document.querySelector('.sizes-row');
+    if (!row) return;
+    const skus = row.querySelectorAll('.sku');
+    if (!skus.length) return;
+    const easeP = 'cubic-bezier(0.77, 0, 0.175, 1)';   // ease-precise
+    const dur   = 0.42;
+    skus.forEach(sku => {
+      sku.addEventListener('mouseenter', () => {
+        skus.forEach(other => {
+          if (other === sku) {
+            gsap.to(other, {
+              y: -6, scale: 1.02, rotationY: 15, opacity: 1,
+              duration: dur, ease: easeP, transformOrigin: '50% 100%'
+            });
+          } else {
+            gsap.to(other, {
+              y: 0, scale: 0.96, rotationY: 0, opacity: 0.45,
+              duration: dur, ease: easeP
+            });
+          }
+        });
+      });
+      sku.addEventListener('mouseleave', () => {
+        skus.forEach(other => {
+          gsap.to(other, {
+            y: 0, scale: 1, rotationY: 0, opacity: 1,
+            duration: dur, ease: easeP
+          });
+        });
+      });
+    });
+  })();
+
+  /* ============ SECTION-INTRO STAGGERED REVEAL ============
+     Each .section-intro splits into 3 beats:
+       1. .chapter (§)     — 240ms, y 8
+       2. .type-h1/h2      — 800ms, y 24
+       3. .type-lead       — 600ms, y 16
+     Once. Respects prefers-reduced-motion (native CSS guard above). */
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !prefersReduced) {
+    const glacial = 'cubic-bezier(0.16, 1, 0.3, 1)';
+    document.querySelectorAll('.section-intro').forEach(intro => {
+      const chapter  = intro.querySelector('.chapter');
+      const heading  = intro.querySelector('.type-h1, .type-h2');
+      const lead     = intro.querySelector('.type-lead');
+      const parts    = [chapter, heading, lead].filter(Boolean);
+      if (!parts.length) return;
+      /* Pre-state */
+      if (chapter) gsap.set(chapter, { opacity: 0, y: 8  });
+      if (heading) gsap.set(heading, { opacity: 0, y: 24 });
+      if (lead)    gsap.set(lead,    { opacity: 0, y: 16 });
+      /* Mark so the general fade-in batch skips this intro's children.
+         We keep .section-intro visible (opacity 1) so batch doesn't hide it. */
+      intro.classList.remove('fade-in');
+      gsap.set(intro, { opacity: 1, y: 0, clearProps: 'transform' });
+      ScrollTrigger.create({
+        trigger: intro,
+        start: 'top 75%',
+        once: true,
+        onEnter: () => {
+          const tl = gsap.timeline();
+          if (chapter) tl.to(chapter, { opacity: 1, y: 0, duration: 0.24, ease: glacial }, 0);
+          if (heading) tl.to(heading, { opacity: 1, y: 0, duration: 0.80, ease: glacial }, 0.08);
+          if (lead)    tl.to(lead,    { opacity: 1, y: 0, duration: 0.60, ease: glacial }, 0.24);
+        }
+      });
+    });
+  }
+
+  /* ============ FAILSAFE — ensure fade-in visibility if GSAP missing ============ */
+  if (typeof gsap === 'undefined') {
+    document.querySelectorAll('.fade-in').forEach(el => {
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    });
+    /* also ensure section-intros are visible */
+    document.querySelectorAll('.section-intro .chapter, .section-intro .type-h1, .section-intro .type-h2, .section-intro .type-lead').forEach(el => {
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    });
+  }
+
+})();
+</script>
+</body>
+</html>
