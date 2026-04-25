@@ -12,7 +12,7 @@
 <!-- Google Fonts: Fraunces (variable) + Inter + JetBrains Mono -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300;9..144,400;9..144,500&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300;9..144,400;9..144,500&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
 
 <!-- GSAP 3.12.5 + ScrollTrigger + Lenis 1.0.42 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -1111,6 +1111,110 @@ section {
 }
 
 /* ============================================================
+   IMPERFEIÇÕES HUMANAS · marginalia · errata · footnote · tooltip
+   ============================================================ */
+.marginalia {
+  font-family: 'Caveat', 'Fraunces', cursive;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--nordic-gold);
+  opacity: 0.78;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  display: block;
+  margin-top: 8px;
+  padding-left: 14px;
+  border-left: 1px solid var(--nordic-gold);
+}
+.marginalia::before { content: "— "; }
+
+.footnote-mark {
+  font-family: var(--font-mono);
+  font-size: 0.62em;
+  vertical-align: super;
+  color: var(--nordic-gold);
+  margin-left: 1px;
+  cursor: help;
+}
+
+.footnote-list {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 0.5px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--fg-soft);
+  letter-spacing: 0.01em;
+  counter-reset: fn;
+}
+.footnote-list li {
+  counter-increment: fn;
+  padding-left: 22px;
+  position: relative;
+  margin-bottom: 6px;
+  list-style: none;
+}
+.footnote-list li::before {
+  content: counter(fn);
+  position: absolute; left: 0; top: 0;
+  font-size: 10px;
+  color: var(--nordic-gold);
+}
+
+.errata-block {
+  margin: 40px auto 24px;
+  max-width: 620px;
+  padding: 18px 22px;
+  border: 0.5px solid color-mix(in srgb, var(--nordic-gold) 50%, transparent);
+  background: color-mix(in srgb, var(--nordic-gold) 5%, transparent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.7;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--ice-paper) 80%, transparent);
+}
+.errata-block .errata-tag {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 2px 8px;
+  background: var(--nordic-gold);
+  color: var(--graphite-deep);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.coord-tip {
+  position: relative;
+  cursor: help;
+  border-bottom: 0.5px dotted var(--nordic-gold);
+}
+.coord-tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%; top: calc(100% + 8px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--graphite-deep);
+  color: var(--ice-paper);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 6px 10px;
+  border: 0.5px solid var(--nordic-gold);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 10;
+}
+.coord-tip:hover::after { opacity: 1; }
+@media (pointer: coarse) {
+  .coord-tip::after { display: none; }
+}
+
+/* ============================================================
    12 · COLOPHON · Footer
    ============================================================ */
 .colophon-section {
@@ -2184,10 +2288,16 @@ section {
 }</pre>
 
       <div class="dossier-abstract">
-        <p><strong>Abstract.</strong> This lot documents a single seasonal draw from the Aletsch Glacier, Valais, at 2,847 m of altitude. The ice layer of origin is approximately 12,000 years old, carrying a δ¹⁸O signature of −17.2‰ consistent with late Pleistocene alpine accumulation.</p>
-        <p>Water was gathered by gravity siphon, without pumping or thermal treatment, decanted in uncoated crystal at 8 °C, and bottled under nitrogen headspace into a hexagonal cylindrical vessel of 6 mm crystal wall. Total Dissolved Solids measured at 145 mg/L; bicarbonate buffer 102 mg/L; pH 7.4.</p>
+        <p><strong>Abstract.</strong> This lot documents a single seasonal draw from the Aletsch Glacier<span class="footnote-mark">¹</span>, Valais, at <span class="coord-tip" data-tip="≈ 35 km from Brig · accessed once per spring">2,847 m</span> of altitude. The ice layer of origin is approximately 12,000 years old, carrying a δ¹⁸O signature of −17.2‰ consistent with late Pleistocene alpine accumulation.</p>
+        <span class="marginalia">cross-checked with the 1953 cantonal survey · slight drift in Mg, within tolerance</span>
+        <p>Water was gathered by gravity siphon, without pumping or thermal treatment, decanted in uncoated crystal at 8 °C, and bottled under nitrogen headspace<span class="footnote-mark">²</span> into a hexagonal cylindrical vessel of 6 mm crystal wall. Total Dissolved Solids measured at 145 mg/L; bicarbonate buffer 102 mg/L; pH 7.4.</p>
         <p>All SKUs (330 mL · 750 mL · 1.5 L) share the same lot identifier. Each closure is individually etched. Each bottle is a single citation — of a mountain, of a millennium, of a very patient calendar.</p>
         <p style="color: var(--accent);">Not produced. Translated.</p>
+
+        <ol class="footnote-list">
+          <li>UNESCO Aletsch Region · Jungfrau-Aletsch World Heritage Site, inscribed 2001. Source ice samples drawn from accumulation zone, not ablation.</li>
+          <li>Headspace fill ≤ 0.4 % O₂. Method adapted from <em>Schweizer Lebensmittelbuch</em>, Cap. 27 b, with minor lab-specific deviations recorded in lot ledger.</li>
+        </ol>
       </div>
 
       <footer class="dossier-foot">
@@ -2261,9 +2371,15 @@ section {
       </div>
     </div>
 
+    <div class="errata-block fade-in">
+      <span class="errata-tag">errata</span>
+      In Vol. I · Issue 000 (proof print, MMXXVI · I) the source altitude was set as 2,847.2 m. The corrected value, retained in this issue, is 2,847 m exactly — measured at the wellhead, not the boardroom. We thank the cantonal surveyor who pointed it out, by hand, on the back of an envelope.
+    </div>
+
     <div class="colophon-final fade-in">
-      <span class="type-caption" style="color: color-mix(in srgb, var(--ice-paper) 65%, transparent);">Bottled in Glacial Lab 01, Valais. This lot: ÆON·A001·MMXXVI·L0342.</span>
-      <span class="type-timestamp">MMXXVI · COPYRIGHT · ÆON</span>
+      <span class="type-caption" style="color: color-mix(in srgb, var(--ice-paper) 65%, transparent);">Bottled in Glacial Lab 01, Valais. This lot: ÆON·A001·MMXXVI·L0342. Set in Fraunces &amp; Inter. Printed on water.</span>
+      <span class="marginalia" style="color: var(--nordic-gold); border-left-color: var(--nordic-gold); margin-top: 16px;">M. A. · Valais · III·MMXXVI</span>
+      <span class="type-timestamp">MMXXVI · COPYRIGHT · ÆON · or thereabouts</span>
     </div>
   </div>
 </section>
