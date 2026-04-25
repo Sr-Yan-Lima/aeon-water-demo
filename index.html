@@ -622,6 +622,111 @@ section {
 .bottle-3d .facet.f5 { transform: rotateY(240deg) translateZ(34px); background: linear-gradient(180deg, var(--glacier-vapor), var(--glacier-blue) 50%, var(--graphite-soft) 100%); opacity: 0.85; }
 .bottle-3d .facet.f6 { transform: rotateY(300deg) translateZ(34px); background: linear-gradient(180deg, var(--ice-paper), var(--glacier-vapor) 40%, var(--ice-shadow) 100%); opacity: 0.94; }
 
+/* Highlight specular nas facets — simula refração de cristal sem WebGL */
+.bottle-3d .facet::before {
+  content: '';
+  position: absolute;
+  top: 8%; left: 10%; width: 18%; height: 84%;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--quartz-white) 80%, transparent) 0%,
+    color-mix(in srgb, var(--ice-paper) 30%, transparent) 50%,
+    transparent 100%
+  );
+  filter: blur(0.5px);
+  pointer-events: none;
+}
+.bottle-3d .facet::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 12%; width: 4%; height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--quartz-white) 90%, transparent) 30%,
+    color-mix(in srgb, var(--quartz-white) 60%, transparent) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Líquido interno animado (water surface) */
+.bottle-3d .liquid {
+  position: absolute;
+  top: 22%;
+  left: 10%;
+  width: 80%;
+  height: 76%;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--glacier-blue) 35%, transparent) 0%,
+    color-mix(in srgb, var(--glacier-blue) 60%, transparent) 30%,
+    color-mix(in srgb, var(--graphite-soft) 70%, transparent) 100%
+  );
+  border-radius: 1px;
+  z-index: 1;
+  overflow: hidden;
+}
+.bottle-3d .liquid::before {
+  content: '';
+  position: absolute;
+  top: -3px; left: -10%; width: 120%; height: 8px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--quartz-white) 70%, transparent),
+    color-mix(in srgb, var(--glacier-vapor) 50%, transparent)
+  );
+  border-radius: 50%;
+  filter: blur(0.6px);
+  animation: liquid-wave 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes liquid-wave {
+  0%, 100% { transform: translateX(0) translateY(0) scaleY(1); }
+  50%      { transform: translateX(-4%) translateY(-1px) scaleY(1.1); }
+}
+
+/* Bubbles internas no líquido */
+.bottle-3d .liquid .bub {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: color-mix(in srgb, var(--quartz-white) 80%, transparent);
+  border-radius: 50%;
+  opacity: 0;
+  bottom: 0;
+  filter: blur(0.3px);
+}
+.bottle-3d .liquid .bub.b1 { left: 20%; animation: bub-rise 5.5s linear infinite; }
+.bottle-3d .liquid .bub.b2 { left: 38%; animation: bub-rise 6.8s linear -1.4s infinite; }
+.bottle-3d .liquid .bub.b3 { left: 56%; animation: bub-rise 7.2s linear -3.0s infinite; }
+.bottle-3d .liquid .bub.b4 { left: 74%; animation: bub-rise 5.9s linear -2.0s infinite; }
+@keyframes bub-rise {
+  0%   { bottom: 4%; opacity: 0; transform: translateX(0) scale(0.8); }
+  10%  { opacity: 0.85; }
+  90%  { opacity: 0.4; }
+  100% { bottom: 96%; opacity: 0; transform: translateX(3px) scale(1.4); }
+}
+
+/* Etched ÆON laser no cap */
+.bottle-3d .cap-mark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: color-mix(in srgb, var(--graphite-deep) 75%, transparent);
+  pointer-events: none;
+  text-shadow: 0 0.5px 0 color-mix(in srgb, var(--quartz-white) 80%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottle-3d .liquid::before,
+  .bottle-3d .liquid .bub { animation: none; }
+}
+
 .bottle-3d .cap {
   position: absolute;
   left: 50%;
@@ -1724,7 +1829,7 @@ section {
     <hr class="hairline" style="margin-top: 96px; margin-bottom: 48px;">
     <div style="display:flex; justify-content:space-between; flex-wrap: wrap; gap: 20px;">
       <span class="type-label">Annotation · Field register</span>
-      <span class="type-spec" style="color: color-mix(in srgb, var(--ice-paper) 85%, transparent);">Observed at 46.5008°N · 8.0362°E · altitude 2,847 m · δ¹⁸O −17.2‰</span>
+      <span class="type-spec" style="color: color-mix(in srgb, var(--ice-paper) 85%, transparent);">Observed at <span class="coord-tip" data-tip="Aletsch · Bernese Alps · UNESCO 2001">46.5008°N · 8.0362°E</span> · altitude 2,847 m · δ¹⁸O −17.2‰</span>
     </div>
   </div>
 </section>
@@ -1754,7 +1859,13 @@ section {
         <span class="facet f4"></span>
         <span class="facet f5"></span>
         <span class="facet f6"></span>
-        <span class="cap top"></span>
+        <span class="liquid">
+          <span class="bub b1"></span>
+          <span class="bub b2"></span>
+          <span class="bub b3"></span>
+          <span class="bub b4"></span>
+        </span>
+        <span class="cap top"><span class="cap-mark">ÆON</span></span>
         <span class="cap bottom"></span>
       </div>
 
@@ -2183,7 +2294,8 @@ section {
             <span class="facet f4"></span>
             <span class="facet f5"></span>
             <span class="facet f6"></span>
-            <span class="cap top" style="transform: rotateX(90deg) translateZ(85px);"></span>
+            <span class="liquid"><span class="bub b1"></span><span class="bub b3"></span></span>
+            <span class="cap top" style="transform: rotateX(90deg) translateZ(85px);"><span class="cap-mark" style="font-size:7px;">ÆON</span></span>
             <span class="cap bottom" style="transform: rotateX(-90deg) translateZ(85px);"></span>
           </div>
         </div>
@@ -2203,7 +2315,8 @@ section {
             <span class="facet f4"></span>
             <span class="facet f5"></span>
             <span class="facet f6"></span>
-            <span class="cap top"></span>
+            <span class="liquid"><span class="bub b1"></span><span class="bub b2"></span><span class="bub b3"></span></span>
+            <span class="cap top"><span class="cap-mark">ÆON</span></span>
             <span class="cap bottom"></span>
           </div>
         </div>
@@ -2223,7 +2336,8 @@ section {
             <span class="facet f4"></span>
             <span class="facet f5"></span>
             <span class="facet f6"></span>
-            <span class="cap top"></span>
+            <span class="liquid"><span class="bub b1"></span><span class="bub b2"></span><span class="bub b3"></span><span class="bub b4"></span></span>
+            <span class="cap top"><span class="cap-mark" style="font-size:11px;">ÆON</span></span>
             <span class="cap bottom"></span>
           </div>
         </div>
